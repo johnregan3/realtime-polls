@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Gamify WP Actions Table
+ * rt_polls WP Actions Table
  *
  * @since  1.0
  */
@@ -14,7 +14,7 @@ if ( ! class_exists( 'WP_List_Table' ) ) {
 	require_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
 }
 
-class Gamify_Badges_Table extends WP_List_Table {
+class Realtime_Polls_Table extends WP_List_Table {
 
 	/**
 	 * Set up Table
@@ -26,8 +26,8 @@ class Gamify_Badges_Table extends WP_List_Table {
 	public function __construct() {
 
 		parent::__construct( array(
-			'singular'  => 'Item',    // Singular name of the listed records
-			'plural'    => 'Items',        // Plural name of the listed records
+			'singular'  => 'Poll',    // Singular name of the listed records
+			'plural'    => 'Polls',        // Plural name of the listed records
 			'ajax'      => false                        // Does this table support ajax?
 		) );
 	}
@@ -44,8 +44,9 @@ class Gamify_Badges_Table extends WP_List_Table {
 	public function get_columns() {
 		$columns = array(
 			'cb'             => '<input type="checkbox" />',
-			'name'           => __( 'Name', 'gamify' ),
-			'activity_points'  => __( 'Points', 'gamify' ),
+			'name'           => __( 'Name', 'rt_polls' ),
+			'date_created'   => __( 'Date Created', 'rt_polls' ),
+			'shortcode'      => __( 'Shortcode', 'rt_polls' ),
 
 		);
 
@@ -65,6 +66,7 @@ class Gamify_Badges_Table extends WP_List_Table {
 	public function get_sortable_columns() {
 		return array(
 			'name'   => array( 'name', true ),
+			'date_created'   => array( 'date', true ),
 		);
 	}
 
@@ -80,10 +82,10 @@ class Gamify_Badges_Table extends WP_List_Table {
 	 *
 	 * @return string Column Name
 	 */
-	function column_default( $item, $column_name ) {
+	function column_default( $poll, $column_name ) {
 		switch( $column_name ){
 			default:
-				return $item[ $column_name ];
+				return $poll[ $column_name ];
 		}
 	}
 
@@ -98,12 +100,12 @@ class Gamify_Badges_Table extends WP_List_Table {
 	 */
 	function column_name( $item ) {
 		$row     = get_post( $item['ID'] );
-		$base         = admin_url( 'admin.php?page=gamify-levels.php&item_id=' . $item['ID'] );
+		$base         = admin_url( 'admin.php?page=realtime-polls.php&poll_id=' . $item['ID'] );
 		$row_actions  = array();
 
-		$row_actions['edit'] = '<a href="' . add_query_arg( array( 'rew-action' => 'edit_item', 'item_id' => $row->ID ) ) . '">' . __( 'Edit', 'gamify' ) . '</a>';
+		$row_actions['edit'] = '<a href="' . add_query_arg( array( 'poll-action' => 'edit_poll', 'poll_id' => $row->ID ) ) . '">' . __( 'Edit', 'rt_polls' ) . '</a>';
 
-		$row_actions['delete'] = '<a href="' . wp_nonce_url( add_query_arg( array( 'rew-action' => 'delete_action', 'item_id' => $row->ID ) ), 'badges_item_nonce' ) . '">' . __( 'Delete', 'gamify' ) . '</a>';
+		$row_actions['delete'] = '<a href="' . wp_nonce_url( add_query_arg( array( 'poll-action' => 'delete_action', 'poll_id' => $row->ID ) ), 'realtime_polls_nonce' ) . '">' . __( 'Delete', 'rt_polls' ) . '</a>';
 
 		return $item['name'] . $this->row_actions( $row_actions );
 	}
@@ -137,7 +139,7 @@ class Gamify_Badges_Table extends WP_List_Table {
 	 */
 	public function get_bulk_actions() {
 		$actions = array(
-			'delete' => __( 'Delete', 'edd' )
+			'delete' => __( 'Delete', 'rt_polls' )
 		);
 
 		return $actions;
@@ -153,14 +155,14 @@ class Gamify_Badges_Table extends WP_List_Table {
 	 * @return void
 	 */
 	public function process_bulk_action() {
-		$ids = isset( $_GET['item'] ) ? $_GET['item'] : false;
+		$ids = isset( $_GET['poll'] ) ? $_GET['poll'] : false;
 
 		if ( ! is_array( $ids ) )
 			$ids = array( $ids );
 
 		foreach ( $ids as $id ) {
 			if ( 'delete' === $this->current_action() ) {
-				badges_remove_item( $id );
+				polls_remove_poll( $id );
 			}
 		}
 
@@ -175,33 +177,34 @@ class Gamify_Badges_Table extends WP_List_Table {
 	 * @since  1.0
 	 * @return array Array of all the data for the action 111s
 	 */
-	public function badges_table_data() {
-		$badges_table_data = array();
+	public function polls_table_data() {
+		$polls_table_data = array();
 
-		$orderby        = isset( $_GET['orderby'] )  ? $_GET['orderby']                  : 'ID';
-		$order          = isset( $_GET['order'] )    ? $_GET['order']                    : 'DESC';
+		$orderby = isset( $_GET['orderby'] ) ? $_GET['orderby'] : 'ID';
+		$order   = isset( $_GET['order'] )   ? $_GET['order']   : 'DESC';
 
 		$args = array(
-			'post_type' => 'badge',
-			'post_status' => 'publish',
+			'post_type'      => 'rt_poll',
+			'post_status'    => 'publish',
 			'posts_per_page' => -1,
-			'orderby' => $orderby,
-			'order' => $order,
+			'orderby'        => $orderby,
+			'order'          => $order,
 			);
 
-		$items = get_posts( $args );
+		$polls = get_posts( $args );
 
-		if ( $items ) {
-			foreach ( $items as $item) {
-				$badges_table_data[] = array(
-					'ID'            => $item->ID,
-					'name'          => get_the_title( $item->ID ),
-					'activity_points'        => get_post_meta( $item->ID, '_gamify_item_activity_points', true ),
+		if ( $polls ) {
+			foreach ( $polls as $poll ) {
+				$polls_table_data[] = array(
+					'ID'           => $poll->ID,
+					'name'         => get_the_title( $poll->ID ),
+					'date_created' => get_the_time( 'd M Y H:i a', $poll->ID ),
+					'shortcode'    => '[Poll ID=' . $poll->ID . ']'
 				);
 			}
 		}
 
-		return $badges_table_data;
+		return $polls_table_data;
 	}
 
 
@@ -212,13 +215,13 @@ class Gamify_Badges_Table extends WP_List_Table {
 	 */
 	public function prepare_items() {
 
-		$columns = $this->get_columns();
-		$hidden = array();
-		$sortable = $this->get_sortable_columns();
+		$columns               = $this->get_columns();
+		$hidden                = array();
+		$sortable              = $this->get_sortable_columns();
 		$this->_column_headers = array( $columns, $hidden, $sortable );
 		$this->process_bulk_action();
-		$data = $this->badges_table_data();
-		$this->items = $data;
+		$data                  = $this->polls_table_data();
+		$this->items           = $data;
 
 	}
 

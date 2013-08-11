@@ -1,0 +1,50 @@
+/**
+ * CSS for Reatlime Polls Plugin
+ */
+
+#adminmenu .menu-icon-generic.toplevel_page_realtime-general div.wp-menu-image {
+	background: url( img/graph-icon-16.png ) 0 0 no-repeat;
+}
+
+#adminmenu .menu-icon-generic.wp-menu-open.toplevel_page_realtime-general div.wp-menu-image {
+	background: url( img/graph-icon-16.png ) -28px 0 no-repeat;
+}
+
+#rt-polls-icon {
+	background: url( img/graph-icon-32.png ) left top no-repeat;
+}
+
+.form-field .rt-poll-label {
+	width: 300px;
+}
+
+
+/**
+ * WP Color Picker Styles
+ */
+
+.wp-picker-input-wrap,
+.wp-picker-holder {
+ 	position:absolute;
+ 	z-index: 100;
+}
+
+.wp-picker-container {
+	height: 19px;
+}
+
+.wp-picker-input-wrap input {
+	height: 19px;
+	width: 65px;
+}
+
+.wp-color-result {
+	height: 19px;
+	margin: 0;
+}
+
+.wp-color-result:after {
+	height: 19px;
+}
+
+

@@ -32,3 +32,21 @@ include_once( plugin_dir_path(__FILE__) . 'includes/admin/realtime-general.php' 
 
 //Polls Listing Page
 include_once( plugin_dir_path(__FILE__) . 'includes/admin/realtime-polls.php' );
+
+//Shortcode Generator
+include_once( plugin_dir_path(__FILE__) . 'includes/shortcodes.php' );
+
+/**
+ * Enqueue Styles and Scripts
+ *
+ * @since 1.0
+ */
+add_action( 'admin_enqueue_scripts', 'rt_polls_scripts' );
+function rt_polls_scripts( ) {
+	wp_register_style( 'rt-polls-style', plugins_url( 'style.css', __FILE__) );
+	wp_enqueue_style( 'rt-polls-style' );
+	wp_enqueue_style( 'wp-color-picker' );
+	wp_register_script( 'rt-polls-scripts', plugins_url( 'scripts.js', __FILE__) );
+	wp_enqueue_script( 'rt-polls-scripts' );
+	wp_enqueue_script( 'my-script-handle', plugins_url( __FILE__ ), array( 'wp-color-picker' ), false, true );
+}
