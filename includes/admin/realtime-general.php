@@ -18,21 +18,37 @@ function register_rt_polls_menu_page() {
  * @since  1.0
  */
 function rt_polls_render_fields() {
-	register_setting( 'rt_polls_settings_group', 'rt_polls_settings', 'validate_rt_polls_settings' );
+	register_setting( 'rt_polls_settings_group', 'rt_polls_settings' );
 
 	add_settings_section(
-		'daily_limit_section',
-		__( 'Daily Points Limit', 'rt_polls' ),
-		'daily_limit_section_cb',
+		'primary_section',
+		__( 'Primary Section', 'rt_polls' ),
+		'primary_section_cb',
 		__FILE__
 	);
 
 	add_settings_field(
-		'daily_limit',
-		__( 'Daily Points Limit', 'rt_polls' ),
-		'daily_limit',
+		'fancy_styles',
+		__( 'Fancy Styling', 'rt_polls' ),
+		'fancy_styles',
 		__FILE__,
-		'daily_limit_section'
+		'primary_section'
+	);
+
+	add_settings_field(
+		'default_colors',
+		__( 'Default Colors', 'rt_polls' ),
+		'default_colors',
+		__FILE__,
+		'primary_section'
+	);
+
+	add_settings_field(
+		'default_restriction',
+		__( 'Default Restriction', 'rt_polls' ),
+		'default_restriction',
+		__FILE__,
+		'primary_section'
 	);
 
 }
@@ -84,6 +100,74 @@ function rt_polls_general_settings() {
 	<?php
 }
 
+/**
+ * @since  1.0
+ */
+function primary_section_cb() {
+	echo "test";
+}
+
+
+/**
+ * @since  1.0
+ */
+function fancy_styles() {
+	$options = get_option('rt_polls_settings');
+	$settings_value = isset( $options['fancy_styles'] ) ? $options['fancy_styles'] : 0;
+	?>
+		<input type="checkbox" id="fancy-styles" name="rt_polls_settings[fancy_styles]" value="1" <?php checked( 1, $settings_value ) ?> />
+	<?php
+}
+
+
+/**
+ * @since  1.0
+ */
+function default_colors() {
+	$options = get_option('rt_polls_settings');
+	$colors = isset( $options['default_colors'] ) ? $options['default_colors'] : 0;
+	$defaults = array( '', '#B8D0DE', '#9FC2D6', '#86B4CF', '#73A2BD', '#6792AB', '#577B8F');
+	$numbers = array( 1, 2, 3, 4, 5, 6 );
+		foreach ( $numbers as $number ) :
+			$color = isset( $colors['field-color-' . $number] ) ? $colors['field-color-' . $number] : $defaults[$number]; ?>
+			<span class="description">Field <?php echo $number; ?></span>&nbsp;&nbsp;<input type="text" name="<?php echo esc_html( 'rt_polls_settings[default_colors][field-color-' . $number . ']' ) ?>" value="<?php echo esc_html( $color ) ?>" class="color-field" />
+			<br />
+		<?php endforeach; ?>
+	<?php
+}
+/**
+ * @since  1.0
+ */
+function default_restriction() {
+	$options = get_option('rt_polls_settings');
+	$restrictions = isset( $options['default_restriction'] ) ? $options['default_restriction'] : 0;
+	//base settings
+	$number = isset( $restrictions['votes_number'] ) ? $restrictions['votes_number'] : 'unlimited';
+	$user = isset( $restrictions['votes_user'] ) ? $restrictions['votes_user'] : 'ip';
+	$time = isset( $restrictions['votes_time'] ) ? $restrictions['votes_time'] : 'ever';
+	?>
+		<select name="rt_polls_settings[default_restriction][votes_number]">
+			<option value="1"  <?php if ( $number == 1 )  echo 'selected="selected"'; ?>>1</option>
+			<option value="5"  <?php if ( $number == 5 )  echo 'selected="selected"'; ?>>5</option>
+			<option value="10" <?php if ( $number == 10 ) echo 'selected="selected"'; ?>>10</option>
+			<option value="25" <?php if ( $number == 25 ) echo 'selected="selected"'; ?>>25</option>
+			<option value="unlimited" <?php if ( $number == 'unlimited' ) echo 'selected="selected"'; ?>>Unlimited</option>
+		</select>
+		<span>&nbsp;Per&nbsp;</span>
+		<select name="rt_polls_settings[default_restriction][votes_user]">
+			<option value="ip"   <?php if ( $user == 'ip' )   echo 'selected="selected"'; ?>>IP</option>
+			<option value="user" <?php if ( $user == 'user' ) echo 'selected="selected"'; ?>>Logged In User</option>
+		</select>
+		<span>&nbsp;Per&nbsp;</span>
+		<select name="rt_polls_settings[default_restriction][votes_time]">
+			<option value="hour" <?php if ( $time == 'hour' ) echo 'selected="selected"'; ?>>Hour</option>
+			<option value="day" <?php if ( $time == 'day' ) echo 'selected="selected"'; ?>>Day</option>
+			<option value="week" <?php if ( $time == 'week' ) echo 'selected="selected"'; ?>>Week</option>
+			<option value="month" <?php if ( $time == 'month' ) echo 'selected="selected"'; ?>>Month</option>
+			<option value="ever" <?php if ( $time == 'ever' ) echo 'selected="selected"'; ?>>Ever</option>
+		</select>
+	<?php
+}
 
 /**
  * @since  1.0
@@ -94,39 +178,4 @@ function checkbox() {
 	?>
 		<input type="checkbox" id="rt_polls_settings[widgets_check]" name="rt_polls_settings[widgets_check]" value="1" <?php checked( 1, $settings_value ) ?> />
 	<?php
-}
-
-
-/**
- * @since  1.0
- */
-function radio() {
-	$options = get_option('rt_polls_settings');
-	//if reward_types isset and is an array, return it, otherwise create a blank array.
-	$settings_value = isset( $options['reward_class'] ) ? $options['reward_class'] : 'reward_score';
-	?>
-
-	<input type="radio" id="reward_currency" name="rt_polls_settings[reward_class]" value="reward_currency" <?php checked( 'reward_currency', $settings_value ) ?> />
-	<span class="description">&nbsp;&nbsp;<?php _e( 'Use Points as Currency and Activate Rewards Catalog', 'rt_polls' ) ?></span><br />
-
-	<input type="radio" id="reward_score" name="rt_polls_settings[reward_class]" value="reward_score" <?php checked( 'reward_score', $settings_value ) ?> />
-	<span class="description">&nbsp;&nbsp;<?php _e( 'Use Points to keep Scores', 'rt_polls' ) ?></span>
-	<?php
-}
-
-/**
- * Validate General Settings
- *
- * @todo Get this up and running
- * @since  1.0
- */
-function validate_rt_polls_settings( $input ) {
-	$options = get_option( 'rt_polls_settings' );
-	$output = array();
-	foreach( $input as $key => $value ) {
-		if( isset( $input[$key] ) ) {
-			$output[$key] = strip_tags( stripslashes( $input[$key] ) );
-		}
-	}
-	return apply_filters( 'validate_rt_polls_settings', $output, $input );
 }

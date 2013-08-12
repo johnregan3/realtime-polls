@@ -16,6 +16,7 @@
 				data : { action: "rt_poll_process", user : user, nonce : nonce, poll_id : poll_id, selection : selection },
 				beforeSend: function() {
 						$(this).attr( "disabled", "disabled" );
+
 						//spinner
 				},
 				complete: function() {
@@ -24,13 +25,14 @@
 						//spinner
 				},
 				success: function(response) {
-					if( response ) {
-						console.log(response);
-					} else {
-						message = "Error processing the event.  Vote not saved."
-						console.log(message);
-					}
+					$('#message-area').html(response);
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					console.log(jqXHR);
+					console.log(textStatus);
+					console.log(errorThrown);
 				}
+
 			});
 		});
 	});

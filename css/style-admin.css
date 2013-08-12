@@ -3,15 +3,15 @@
  */
 
 #adminmenu .menu-icon-generic.toplevel_page_realtime-general div.wp-menu-image {
-	background: url( img/graph-icon-16.png ) 0 0 no-repeat;
+	background: url( ../img/graph-icon-16.png ) 0 0 no-repeat;
 }
 
 #adminmenu .menu-icon-generic.wp-menu-open.toplevel_page_realtime-general div.wp-menu-image {
-	background: url( img/graph-icon-16.png ) -28px 0 no-repeat;
+	background: url( ../img/graph-icon-16.png ) -28px 0 no-repeat;
 }
 
 #rt-polls-icon {
-	background: url( img/graph-icon-32.png ) left top no-repeat;
+	background: url( ../img/graph-icon-32.png ) left top no-repeat;
 }
 
 .form-field .rt-poll-label {

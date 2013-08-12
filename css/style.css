@@ -31,7 +31,7 @@
 /* Graph */
 /* Containers */
 #figure {
-	height: 380px;
+	height: 405px;
 	position: relative;
 }
 #figure ul {
@@ -46,22 +46,21 @@
 
 /* Legend */
 .legend {
-	background: rgba( 200, 200, 200, .3);
+	/* background: rgba( 200, 200, 200, .3); */
 	bottom: 0;
 	position: absolute;
 	text-align: left;
 }
-.legend li {
+#figure .legend li {
 	display: block;
 	float: left;
 	height: 20px;
 	margin: 0;
-	padding: 10px 30px;
-	width: 120px;
+	padding: 10px 5%;
+	width: 40%;
 }
 .legend span.icon {
 	background-position: 50% 0;
-	border-radius: 2px;
 	display: block;
 	float: left;
 	height: 16px;
@@ -106,6 +105,7 @@
 /* Graph Bars */
 .bars {
 	height: 253px;
+	margin: 0;
 	position: absolute;
 	width: 100%;
 	z-index: 10;
@@ -113,9 +113,9 @@
 .bar-group {
 	float: left;
 	height: 100%;
-	margin: 0 100px;
+	margin: 0 0 0 10%;
 	position: relative;
-	width: 76px;
+	width: 90%;
 }
 .bar {
 	bottom: 0;

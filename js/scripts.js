@@ -1,12 +1,11 @@
 /**
- *	Animated Graph Tutorial for Smashing Magazine
- *	July 2011
+ * Animated Graph
+ * July 2011
  *
- * 	Author:	Derek Mack
- *			derekmack.com
- *			@derek_mack
- *
- *	Example - Animated Bar Chart via CSS Transitions
+ * Author:  Derek Mack
+ *          derekmack.com
+ *          @derek_mack
+ * http://coding.smashingmagazine.com/2011/09/23/create-an-animated-bar-graph-with-html-css-and-jquery/
  */
 
 (function ($) {
@@ -43,6 +42,11 @@ $(document).ready(function() {
 				});
 				return chartData;
 			},
+			// Get heading data from table caption
+			chartHeading: function() {
+				var chartHeading = data.find('caption').text();
+				return chartHeading;
+			},
 			// Get legend data from table body
 			chartLegend: function() {
 				var chartLegend = [];
@@ -56,7 +60,8 @@ $(document).ready(function() {
 			chartYMax: function() {
 				var chartData = this.chartData();
 				// Round off the value
-				var chartYMax = Math.ceil(Math.max.apply(Math, chartData) / 1000) * 1000;
+				//var chartYMax = Math.ceil(Math.max.apply(Math, chartData) / 1000) * 1000;
+				var chartYMax = Math.ceil(Math.max.apply(Math, chartData) / 10) * 10;
 				return chartYMax;
 			},
 			// Get y-axis data from table cells
@@ -67,7 +72,8 @@ $(document).ready(function() {
 				var yAxisMarkings = 5;
 				// Add required number of y-axis markings in order from 0 - max
 				for (var i = 0; i < yAxisMarkings; i++) {
-					yLegend.unshift(((chartYMax * i) / (yAxisMarkings - 1)) / 1000);
+				//yLegend.unshift(((chartYMax * i) / (yAxisMarkings - 1)) / 1000);
+					yLegend.unshift((chartYMax * i) / (yAxisMarkings - 1));
 				}
 				return yLegend;
 			},
@@ -120,6 +126,11 @@ $(document).ready(function() {
 			// Add bar groups to graph
 			barGroup.appendTo(barContainer);
 		});
+
+		// Add heading to graph
+		var chartHeading = tableData.chartHeading();
+		var heading = $('<h4>' + chartHeading + '</h4>');
+		heading.appendTo(figureContainer);
 
 		// Add legend to graph
 		var chartLegend	= tableData.chartLegend();
@@ -206,5 +217,39 @@ $(document).ready(function() {
 		resetGraph();
 	}
 });
+
+/**
+ * Animated Graph Updated
+ * August 2013
+ *
+ * Author:  John Regan
+ *          johnregan3.me
+ *          @johnregan3
+ */
+
+// Hook into the heartbeat-send
+	$(document).on('heartbeat-send', function(e, data) {
+		data['rt_polls_heartbeat'] = 'graph_update';
+	});
+
+	// Listen for the custom event "heartbeat-tick" on $(document).
+	$(document).on( 'heartbeat-tick', function(e, data) {
+
+		// Only proceed if our EDD data is present
+		if ( ! data['graph-percentage'] )
+			return;
+
+		// Log the response for easy proof it works
+		console.log( data['graph-percentage'] );
+
+		// Update sale count and bold it to provide a highlight
+		$('.edd_dashboard_widget .b.b-sales').text( data['graph-percentage'] ).css( 'font-weight', 'bold' );
+
+		// Return font-weight to normal after 2 seconds
+		setTimeout(function(){
+			$('.edd_dashboard_widget .b.b-sales').css( 'font-weight', 'normal' );;
+		}, 2000);
+
+	});
 
 }(jQuery));
