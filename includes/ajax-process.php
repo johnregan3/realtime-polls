@@ -16,13 +16,13 @@ class RT_POLLS {
 	 * @param  array   $poll_meta  Array of data from the Poll's meta row
 	 * @return string  $limit      User's selection of time limit
 	 */
-	public static function get_limits( $poll_meta ) {
+	public static function get_limit( $poll_meta ) {
 		$limits = array( 1, 5, 10, 25 );
 		foreach ( $limits as $limit ) {
-			if ( in_array( $poll_meta['votes_number'], $limits ) == true ) {
+			if ( $poll_meta['votes_number'] == $limit ) {
 				$limit = $poll_meta['votes_number'];
 			} else {
-				$limit = '';
+				$limit = '99999999';
 			}
 		}
 		return $limit;
@@ -89,9 +89,13 @@ class RT_POLLS {
 					}
 				}
 			}
-			$votes_submitted = count( $votes_count_array );
+			if ( isset( $votes_count_array ) ) {
+				$votes_submitted = count( $votes_count_array );
+			} else {
+				$votes_submitted = 0;
+			}
 		}
-		if ( isset( $votes_submitted ) && $limit >= $votes_submitted ) {
+		if ( isset( $votes_submitted ) && $votes_submitted >= $limit ) {
 
 			$message = "Your vote limit has been reached.  Please try again later." ;
 			$json_result = json_encode( $message );
@@ -132,14 +136,17 @@ class RT_POLLS {
 					$poll_meta[$val] = 1;
 				}
 				//record the act of voting
-				$selection = $poll_meta[$selection];
-				$poll_meta[$user][$time] = $selection;
+				$selection_label = $poll_meta[$selection];
+				$poll_meta[$user][$time] = $selection_label;
 			}
 		}
 
 		$result = update_post_meta( $poll_id, 'rt_polls_data', $poll_meta );
 		$message = $result ? "Vote Successful.  Thank you for participating." : "Vote Failed.  Please try again.";
-		$json_result = json_encode( $message );
+		$info['updatedlabel'] = $selection_label;
+		$info['updatedid'] = $selection;
+		$info['message'] = $message;
+		$json_result = json_encode( $info );
 		echo $json_result;
 		die();
 	}
@@ -175,7 +182,7 @@ function rt_poll_process() {
 	$poll_meta = get_post_meta( $poll_id, 'rt_polls_data', true );
 
 	//Get data to check if vote limit has been reached
-	$limit = RT_POLLS::get_limits( $poll_meta );
+	$limit = RT_POLLS::get_limit( $poll_meta );
 	$time_limit = RT_POLLS::get_time_limit( $poll_meta );
 
 	//Check to see if limit reached.  If so, exit.  If not, proceed.
