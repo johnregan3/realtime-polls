@@ -177,39 +177,31 @@ $(document).ready(function() {
 				$(bars[i].bar).css({'height': bars[i].height, '-webkit-transition': 'all 0.8s ease-out'});
 				$(bars[i].bar).css({'height': bars[i].height, '-o-transition': 'all 0.8s ease-out'});
 				$(bars[i].bar).css({'height': bars[i].height, '-ms-transition': 'all 0.8s ease-out'});
-				// Wait the specified time then run the displayGraph() function again for the next bar
-				barTimer = setTimeout(function() {
-					i++;
-					displayGraph(bars, i);
-				}, 100);
+				i++;
+				displayGraph(bars, i);
+
 			}
 		}
 
 		// Reset graph settings and prepare for display
 		function resetGraph() {
 			// Set bar height to 0 and clear all transitions
-			$.each(bars, function(i) {
-				$(bars[i].bar).stop().css({'height': 0, '-moz-transition': 'none'});
-				$(bars[i].bar).stop().css({'height': 0, '-webkit-transition': 'none'});
-				$(bars[i].bar).stop().css({'height': 0, '-o-transition': 'none'});
-				$(bars[i].bar).stop().css({'height': 0, '-ms-transition': 'none'});
-			});
+
 
 			// Clear timers
 			clearTimeout(barTimer);
 			clearTimeout(graphTimer);
 
-			// Restart timer
-			graphTimer = setTimeout(function() {
 				displayGraph(bars, 0);
-			}, 200);
 		}
+
 
 		// Helper functions
 
 		// Finally, display graph via reset function
 		resetGraph();
 	}
+
 
 		$("#rt-poll-button").click( function() {
 
@@ -234,23 +226,20 @@ $(document).ready(function() {
 						//spinner
 				},
 				success: function(response) {
-					$('#message-area').html(response);
-					var fieldTitle = response.updatedcolumn;
-
+					$('#message-area').html(response.message);
+					var fieldTitle = response.updatedlabel;
+					console.log(fieldTitle);
 					$('#data-table th').each(function() {
-						if( fieldTitle == $(this).html() ) {
-							console.log('success');
-							rtbar = $(this);
-							var amount = rtbar.siblings('td').html();
-							parseInt(amount);
-							console.log(amount);
-							amount++;
-							parseInt(amount);
-							rtbar.siblings('td').html(amount);
-						};
-					 });
+						if( fieldTitle == $(this).text() ) {
+							var td = $(this).siblings();
+							var value = parseInt(td.text());
+							value++;
+							$(td).text(value);
+						}
+					});
+
 					 $('.chart #figure').remove();
-					createGraph('#data-table', '.chart').displayGraph();
+					createGraph('#data-table', '.chart');
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					console.log(jqXHR);
@@ -261,7 +250,6 @@ $(document).ready(function() {
 			});
 		});
 	});
-
 
 
 /**

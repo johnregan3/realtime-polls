@@ -120,10 +120,10 @@
 .bar {
 	bottom: 0;
 	cursor: pointer;
-	height: 0;
 	position: absolute;
 	text-align: center;
 	width: 100px;
+	height: 0;
 }
 
 .bar span {
