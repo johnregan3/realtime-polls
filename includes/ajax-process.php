@@ -97,8 +97,8 @@ class RT_POLLS {
 		}
 		if ( isset( $votes_submitted ) && $votes_submitted >= $limit ) {
 
-			$message = "Your vote limit has been reached.  Please try again later." ;
-			$json_result = json_encode( $message );
+			$info['message'] = "Your vote limit has been reached.  Please try again later." ;
+			$json_result = json_encode( $info );
 			echo $json_result;
 			die();
 

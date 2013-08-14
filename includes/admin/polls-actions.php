@@ -175,7 +175,7 @@ function polls_poll_exists( $poll_id ) {
 function polls_get_poll( $poll_id ) {
 	$poll = get_post( $poll_id );
 
-	if ( get_post_type( $poll_id ) != 'rt_poll' )
+	if ( get_post_type( $poll->ID ) != 'rt_poll' )
 		return false;
 
 	return $poll;

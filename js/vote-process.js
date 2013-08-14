@@ -12,10 +12,6 @@
 // Wait for the DOM to load everything, just to be safe
 $(document).ready(function() {
 
-	// Create our graph from the data table and specify a container to put the graph in
-	createGraph('#data-table', '.chart');
-
-	// Here be graphs
 	function createGraph(data, container) {
 		// Declare some common variables and container elements
 		var bars = [];
@@ -33,7 +29,7 @@ $(document).ready(function() {
 		var graphTimer;
 
 		// Create table data object
-		var tableData = {
+		this.tableData = {
 			// Get numerical data from table cells
 			chartData: function() {
 				var chartData = [];
@@ -102,38 +98,38 @@ $(document).ready(function() {
 		}
 
 		// Useful variables for accessing table data
-		chartData = tableData.chartData();
-		chartYMax = tableData.chartYMax();
-		columnGroups = tableData.columnGroups();
+		chartData = this.tableData.chartData();
+		chartYMax = this.tableData.chartYMax();
+		columnGroups = this.tableData.columnGroups();
 
 		// Construct the graph
 
 		// Loop through column groups, adding bars as we go
-		$.each(columnGroups, function(i) {
-			// Create bar group container
-			var barGroup = $('<div class="bar-group"></div>');
-			// Add bars inside each column
-			for (var j = 0, k = columnGroups[i].length; j < k; j++) {
-				// Create bar object to store properties (label, height, code etc.) and add it to array
-				// Set the height later in displayGraph() to allow for left-to-right sequential display
-				var barObj = {};
-				barObj.label = this[j];
-				barObj.height = Math.floor(barObj.label / chartYMax * 100) + '%';
-				barObj.bar = $('<div class="bar fig' + j + '"><span>' + barObj.label + '</span></div>')
-					.appendTo(barGroup);
-				bars.push(barObj);
-			}
-			// Add bar groups to graph
-			barGroup.appendTo(barContainer);
-		});
+		this.barspush = function(columnGroups, chartYMax) {
+			$.each(columnGroups, function(i) {
+				// Create bar group container
+				var barGroup = $('<div class="bar-group"></div>');
+				// Add bars inside each column
+				for (var j = 0, k = columnGroups[i].length; j < k; j++) {
+					// Create bar object to store properties (label, height, code etc.) and add it to array
+					// Set the height later in displayGraph() to allow for left-to-right sequential display
+					var barObj = {};
+					barObj.label = this[j];
+					barObj.height = Math.floor(barObj.label / chartYMax * 100) + '%';
+					barObj.bar = $('<div class="bar fig' + j + '"><span>' + barObj.label + '</span></div>')
+						.appendTo(barGroup);
+					bars.push(barObj);
+				}
+				// Add bar groups to graph
+				barGroup.appendTo(barContainer);
+				return bars;
+			});
 
-		// Add heading to graph
-		var chartHeading = tableData.chartHeading();
-		var heading = $('<h4>' + chartHeading + '</h4>');
-		heading.appendTo(figureContainer);
+		}
+		this.barspush(columnGroups, chartYMax)
 
 		// Add legend to graph
-		var chartLegend	= tableData.chartLegend();
+		var chartLegend	= this.tableData.chartLegend();
 		var legendList	= $('<ul class="legend"></ul>');
 		$.each(chartLegend, function(i) {
 			var listItem = $('<li><span class="icon fig' + i + '"></div></span>' + this + '</li>')
@@ -142,7 +138,7 @@ $(document).ready(function() {
 		legendList.appendTo(figureContainer);
 
 		// Add x-axis to graph
-		var xLegend	= tableData.xLegend();
+		var xLegend	= this.tableData.xLegend();
 		var xAxisList	= $('<ul class="x-axis"></ul>');
 		$.each(xLegend, function(i) {
 			var listItem = $('<li><span>' + this + '</span></li>')
@@ -151,7 +147,7 @@ $(document).ready(function() {
 		xAxisList.appendTo(graphContainer);
 
 		// Add y-axis to graph
-		var yLegend	= tableData.yLegend();
+		var yLegend	= this.tableData.yLegend();
 		var yAxisList	= $('<ul class="y-axis"></ul>');
 		$.each(yLegend, function(i) {
 			var listItem = $('<li><span>' + this + '</span></li>')
@@ -168,66 +164,120 @@ $(document).ready(function() {
 		// Add graph container to main container
 		figureContainer.appendTo(container);
 
-		// Set individual height of bars
-		function displayGraph(bars, i) {
+	};
+
+	function renderGraph() {
+			// Set individual height of bars
+		this.displayGraph = function (bars, i) {
+
 			// Changed the way we loop because of issues with $.each not resetting properly
 			if (i < bars.length) {
+
 				// Add transition properties and set height via CSS
 				$(bars[i].bar).css({'height': bars[i].height, '-moz-transition': 'all 0.8s ease-out'});
 				$(bars[i].bar).css({'height': bars[i].height, '-webkit-transition': 'all 0.8s ease-out'});
 				$(bars[i].bar).css({'height': bars[i].height, '-o-transition': 'all 0.8s ease-out'});
 				$(bars[i].bar).css({'height': bars[i].height, '-ms-transition': 'all 0.8s ease-out'});
 				i++;
-				displayGraph(bars, i);
+				this.displayGraph(bars, i);
 
 			}
 		}
-
 		// Reset graph settings and prepare for display
-		function resetGraph() {
+		this.resetGraph = function () {
 			// Set bar height to 0 and clear all transitions
 
+			var create = new createGraph('#data-table', '.chart');
+			var bars = [];
+			columnGroups = create.tableData.columnGroups();
+			chartYMax = create.tableData.chartYMax();
+			console.log(columnGroups);
+			console.log(chartYMax);
+			$.each(columnGroups, function(i) {
+				// Create bar group container
+				var barGroup = $('<div class="bar-group"></div>');
+				// Add bars inside each column
+				for (var j = 0, k = columnGroups[i].length; j < k; j++) {
+					// Create bar object to store properties (label, height, code etc.) and add it to array
+					// Set the height later in displayGraph() to allow for left-to-right sequential display
+					var barObj = {};
+					barObj.label = this[j];
+					barObj.height = Math.floor(barObj.label / chartYMax * 100) + '%';
+					barObj.bar = $('<div class="bar fig' + j + '"><span>' + barObj.label + '</span></div>')
+						.appendTo(barGroup);
+					bars.push(barObj);
+				}
+			});
+			$.each(bars, function(i) {
+				console.log(bars[i].bar);
+				$(bars[i].bar).stop().css({'height': 0, '-moz-transition': 'none'});
+				$(bars[i].bar).stop().css({'height': 0, '-webkit-transition': 'none'});
+				$(bars[i].bar).stop().css({'height': 0, '-o-transition': 'none'});
+				$(bars[i].bar).stop().css({'height': 0, '-ms-transition': 'none'});
+			});
+			this.displayGraph(bars, 0);
+		};
 
-			// Clear timers
-			clearTimeout(barTimer);
-			clearTimeout(graphTimer);
 
-				displayGraph(bars, 0);
+		this.recalcGraph = function() {
+			recreate = new createGraph('#data-table', '.chart');
+			var bars = [];
+			columnGroups = recreate.tableData.columnGroups();
+			chartYMax = recreate.tableData.chartYMax();
+			console.log(columnGroups);
+			console.log(chartYMax);
+			$.each(columnGroups, function(i) {
+				// Create bar group container
+				var barGroup = $('<div class="bar-group"></div>');
+				// Add bars inside each column
+				for (var j = 0, k = columnGroups[i].length; j < k; j++) {
+					// Create bar object to store properties (label, height, code etc.) and add it to array
+					// Set the height later in displayGraph() to allow for left-to-right sequential display
+					var barObj = {};
+					barObj.label = this[j];
+					barObj.height = Math.floor(barObj.label / chartYMax * 100) + '%';
+					barObj.bar = $('<div class="bar fig' + j + '"><span>' + barObj.label + '</span></div>')
+						.appendTo(barGroup);
+					bars.push(barObj);
+				}
+			});
+			console.log(bars);
+			this.displayGraph(bars, 0);
 		}
-
-
-		// Helper functions
-
-		// Finally, display graph via reset function
-		resetGraph();
 	}
 
 
-		$("#rt-poll-button").click( function() {
+		startGraph = new renderGraph();
+		startGraph.resetGraph();
 
-			user      = $(this).attr("data-user");
-			nonce     = $(this).attr("data-nonce");
-			poll_id   = $(this).attr("data-poll");
-			selection = $('#rt-vote-select').val();
 
-			$.ajax({
-				type : "post",
-				dataType : "json",
-				url : rt_polls_ajax.ajaxurl,
-				data : { action: "rt_poll_process", user : user, nonce : nonce, poll_id : poll_id, selection : selection },
-				beforeSend: function() {
-						$(this).attr( "disabled", "disabled" );
 
-						//spinner
-				},
-				complete: function() {
-						//if limit reached, do not re-enable.  send a message.
-						$(this).removeAttr( "disabled" );
-						//spinner
-				},
-				success: function(response) {
-					$('#message-area').html(response.message);
-					var fieldTitle = response.updatedlabel;
+
+	$("#rt-poll-button").click( function() {
+
+		user      = $(this).attr("data-user");
+		nonce     = $(this).attr("data-nonce");
+		poll_id   = $(this).attr("data-poll");
+		selection = $('#rt-vote-select').val();
+
+		$.ajax({
+			type : "post",
+			dataType : "json",
+			url : rt_polls_ajax.ajaxurl,
+			data : { action: "rt_poll_process", user : user, nonce : nonce, poll_id : poll_id, selection : selection },
+			beforeSend: function() {
+					$(this).attr( "disabled", "disabled" );
+
+					//spinner
+			},
+			complete: function() {
+					//if limit reached, do not re-enable.  send a message.
+					$(this).removeAttr( "disabled" );
+					//spinner
+			},
+			success: function(response) {
+				$('#message-area').html(response.message);
+				var fieldTitle = response.updatedlabel;
 					console.log(fieldTitle);
 					$('#data-table th').each(function() {
 						if( fieldTitle == $(this).text() ) {
@@ -237,19 +287,19 @@ $(document).ready(function() {
 							$(td).text(value);
 						}
 					});
+				recalcGraph();
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				console.log(jqXHR);
+				console.log(textStatus);
+				console.log(errorThrown);
+			}
 
-					 $('.chart #figure').remove();
-					createGraph('#data-table', '.chart');
-				},
-				error: function(jqXHR, textStatus, errorThrown) {
-					console.log(jqXHR);
-					console.log(textStatus);
-					console.log(errorThrown);
-				}
-
-			});
 		});
 	});
+});
+
+
 
 
 /**
