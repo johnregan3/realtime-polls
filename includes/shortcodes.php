@@ -39,20 +39,76 @@ function rt_polls_shortcode( $atts, $content = null ) {
 		?>
 
 	</style>
-	<div id="wrapper">
-		<div class="chart">
-			<table id="data-table" border="1" cellpadding="10" cellspacing="0">
-				<tbody>
-					<?php foreach ( $labels_array as $label => $val ) :
-							$votes = isset( $options[$val] ) ? $options[$val] : 0 ; ?>
-							<tr>
-								<th scope="row"><?php echo esc_html( $val ); ?></th>
-								<td><?php echo esc_html( $votes ) ?></td>
-							</tr>
-						<?php endforeach; ?>
-				</tbody>
-			</table>
-		</div>
+
+	<script type="text/javascript">
+	jQuery(document).ready(function () {
+<?php
+$a = 0;
+$i = 1;
+end($labels_array);
+$last_key = key($labels_array);
+	foreach ( $labels_array as $label => $val ) :
+	$votes = isset( $options[$val] ) ? $options[$val] : 0 ;
+		echo 'var dl_' . $i . ' = [[' . $a . ', ' . esc_html( $votes ) . ']];';
+		$a++;
+		$i++;
+		?>
+
+
+		<?php
+		endforeach; ?>
+
+	<?php
+	$i = 1;
+	echo 'var data_1 = [';
+		foreach ( $labels_array as $label => $val ) :
+	$votes = isset( $options[$val] ) ? $options[$val] : 0 ;
+			echo '{label: "' . esc_html( $val ) . '",
+			data: dl_' . $i .',
+			bars: {
+				show: true,
+                barWidth: 1,
+                fill: true,
+                align: "center",
+                lineWidth: 1,
+                order: ' . $i . ',
+				fillColor: "' . esc_html( $options["field-color-" . $i] ) . '"
+			},
+			color: "' . esc_html( $options["field-color-" . $i] ) . '"
+		}';
+		if($label !== $last_key)
+			echo ',';
+		$i++;
+endforeach;
+	?>
+];
+
+
+    jQuery.plot(jQuery("#placeholder"), data_1, {
+        xaxis: {
+        	tickLength: '0',
+        	axisLabelFontSizePixels: 12,
+        	axisLabelFontFamily: '"Open Sans", Helvetica, Arial, sans-serif;',
+        	ticks: [
+        	<?php
+        	$i = 0;
+        	foreach ( $labels_array as $label => $val ) : ?>
+        		[<?php echo $i; ?>, ""]
+        		<?php
+        		if($label !== $last_key)
+					echo ',';
+				$i++;
+        	endforeach;
+        	?>]
+        },
+        grid: {
+        	borderWidth: 0,
+        },
+       });
+});
+</script>
+	<div id="placeholder" style="width: 100%; height: 400px;">
+
 	</div>
 
 	<div id="rt-poll-vote-area">
