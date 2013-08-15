@@ -22,7 +22,7 @@ function rt_polls_render_fields() {
 
 	add_settings_section(
 		'primary_section',
-		__( 'Primary Section', 'rt_polls' ),
+		__( 'General Settings', 'rt_polls' ),
 		'primary_section_cb',
 		__FILE__
 	);
@@ -31,6 +31,14 @@ function rt_polls_render_fields() {
 		'fancy_styles',
 		__( 'Fancy Styling', 'rt_polls' ),
 		'fancy_styles',
+		__FILE__,
+		'primary_section'
+	);
+
+	add_settings_field(
+		'graph_orientation',
+		__( 'Graph Orientation', 'rt_polls' ),
+		'graph_orientation',
 		__FILE__,
 		'primary_section'
 	);
@@ -104,7 +112,7 @@ function rt_polls_general_settings() {
  * @since  1.0
  */
 function primary_section_cb() {
-	echo "test";
+	echo "These settings apply to all graphs, except for the colors.<br />The <em>Default</em> colors are set here, but you can always change them on individual graphs.";
 }
 
 
@@ -115,7 +123,21 @@ function fancy_styles() {
 	$options = get_option('rt_polls_settings');
 	$settings_value = isset( $options['fancy_styles'] ) ? $options['fancy_styles'] : 0;
 	?>
-		<input type="checkbox" id="fancy-styles" name="rt_polls_settings[fancy_styles]" value="1" <?php checked( 1, $settings_value ) ?> />
+		<input type="checkbox" id="fancy-styles" name="rt_polls_settings[fancy_styles]" value="1" <?php checked( 1, $settings_value ) ?> />&nbsp;&nbsp;<span class="description">On/Off</span>
+	<?php
+}
+
+/**
+ * @since  1.0
+ */
+function graph_orientation() {
+	$options = get_option('rt_polls_settings');
+	$settings_value = isset( $options['graph_orientation'] ) ? $options['graph_orientation'] : 'vertical';
+	?>
+		<select name="rt_polls_settings[graph_orientation]" >
+			<option value="vertical"  <?php if ( $settings_value == 'vertical' )  echo 'selected="selected"'; ?>>Vertical</option>
+			<option value="horizontal"  <?php if ( $settings_value == 'horizontal' )  echo 'selected="selected"'; ?>>Horizontal</option>
+		</select>
 	<?php
 }
 
@@ -126,7 +148,7 @@ function fancy_styles() {
 function default_colors() {
 	$options = get_option('rt_polls_settings');
 	$colors = isset( $options['default_colors'] ) ? $options['default_colors'] : 0;
-	$defaults = array( '', '#B8D0DE', '#9FC2D6', '#86B4CF', '#73A2BD', '#6792AB', '#6490a8');
+	$defaults = array( '', '#B8D0DE', '#9FC2D6', '#86B4CF', '#73A2BD', '#6792AB', '#5a8799');
 	$numbers = array( 1, 2, 3, 4, 5, 6 );
 		foreach ( $numbers as $number ) :
 			$color = isset( $colors['field-color-' . $number] ) ? $colors['field-color-' . $number] : $defaults[$number]; ?>

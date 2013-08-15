@@ -54,6 +54,8 @@ $last_key = key($labels_array);
 	echo 'var data_1 = [';
 		foreach ( $labels_array as $label => $val ) :
 	$votes = isset( $options[$val] ) ? $options[$val] : 0 ;
+	$rt_options = get_option('rt_polls_settings');
+
 	$org_color = $options["field-color-" . $i];
 		$gradient = RT_Colors::adjustBrightness( $org_color, -80);
 		$rt_options = get_option('rt_polls_settings');
@@ -80,7 +82,12 @@ $last_key = key($labels_array);
 			echo ',';
 		$i++;
 endforeach;
-	?>
+
+			if ( 'horizontal' == $rt_options['graph_orientation'] ) {
+				$horizontal = 'horizontal : true,';
+			} else {
+				$horizontal = '';
+			} ?>
 ];
 
 
@@ -105,6 +112,9 @@ endforeach;
         },
         grid: {
         	borderWidth: 0,
+        },
+        bars: {
+                <?php echo $horizontal ?>
         }
        });
 });

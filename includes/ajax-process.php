@@ -153,9 +153,15 @@ class RT_POLLS {
 			$i = 1;
 				foreach ( $labels_array as $label => $val ) :
 					$votes = isset( $options[$val] ) ? $options[$val] : 0 ;
+					$rt_options = get_option('rt_polls_settings');
+						if ( 'horizontal' == $rt_options['graph_orientation'] ) {
+								$horizontal = 'horizontal : true,';
+							} else {
+								$horizontal = '';
+							}
 						$org_color = $options["field-color-" . $i];
 						$gradient = RT_Colors::adjustBrightness( $org_color, -80);
-						$rt_options = get_option('rt_polls_settings');
+
 							if ( isset( $rt_options['fancy_styles'] ) && 1 == $rt_options['fancy_styles'] ) {
 								$color = "{ colors: [ '" . $org_color . "', '" . $gradient . "'] }";
 							} else {
@@ -171,6 +177,7 @@ class RT_POLLS {
 							bars: {
 								show: true,
 				                barWidth: .9,
+				                ' . $horizontal . '
 				                fill: true,
 				                align: "center",
 				                lineWidth: 1,
