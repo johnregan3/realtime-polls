@@ -126,7 +126,7 @@ function fancy_styles() {
 function default_colors() {
 	$options = get_option('rt_polls_settings');
 	$colors = isset( $options['default_colors'] ) ? $options['default_colors'] : 0;
-	$defaults = array( '', '#B8D0DE', '#9FC2D6', '#86B4CF', '#73A2BD', '#6792AB', '#577B8F');
+	$defaults = array( '', '#B8D0DE', '#9FC2D6', '#86B4CF', '#73A2BD', '#6792AB', '#6490a8');
 	$numbers = array( 1, 2, 3, 4, 5, 6 );
 		foreach ( $numbers as $number ) :
 			$color = isset( $colors['field-color-' . $number] ) ? $colors['field-color-' . $number] : $defaults[$number]; ?>

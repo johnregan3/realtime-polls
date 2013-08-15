@@ -3,6 +3,8 @@
 // Wait for the DOM to load everything, just to be safe
 $(document).ready(function() {
 
+	//speed up heartbeat
+	wp.heartbeat.interval( 'fast' );
 
 	$("#rt-poll-button").click( function() {
 
@@ -27,17 +29,12 @@ $(document).ready(function() {
 					//spinner
 			},
 			success: function(response) {
-				$('#message-area').html(response.message);
-				var fieldTitle = response.updatedlabel;
-					console.log(fieldTitle);
-					$('#data-table th').each(function() {
-						if( fieldTitle == $(this).text() ) {
-							var td = $(this).siblings();
-							var value = parseInt(td.text());
-							value++;
-							$(td).text(value);
-						}
-					});
+				$('#message-area').html(response.message)
+				eval(response.data_1);
+				eval(response.options);
+
+			    jQuery.plot( jQuery( "#placeholder" ), data_1, options );
+
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
 				console.log(jqXHR);
@@ -60,30 +57,21 @@ $(document).ready(function() {
  *          johnregan3.me
  *          @johnregan3
  */
+		$(document).on('heartbeat-send', function(e, data) {
+            data['rt_polls_heartbeat'] = 'graph_update';
+            data['poll_id'] = $("#rt-poll-button").attr('data-poll');
+        });
 
-// Hook into the heartbeat-send
-	$(document).on('heartbeat-send', function(e, data) {
-		data['rt_polls_heartbeat'] = 'graph_update';
-	});
+        // Listen for the custom event "heartbeat-tick" on $(document).
+        $(document).on( 'heartbeat-tick', function(e, data) {
 
-	// Listen for the custom event "heartbeat-tick" on $(document).
-	$(document).on( 'heartbeat-tick', function(e, data) {
+				eval(data['poll_data'].data_1);
+				eval(data['poll_data'].options);
 
-		// Only proceed if our EDD data is present
-		if ( ! data['graph-percentage'] )
-			return;
+			    jQuery.plot( jQuery( "#placeholder" ), data_1, options );
 
-		// Log the response for easy proof it works
-		console.log( data['graph-percentage'] );
 
-		// Update sale count and bold it to provide a highlight
-		$('.edd_dashboard_widget .b.b-sales').text( data['graph-percentage'] ).css( 'font-weight', 'bold' );
-
-		// Return font-weight to normal after 2 seconds
-		setTimeout(function(){
-			$('.edd_dashboard_widget .b.b-sales').css( 'font-weight', 'normal' );;
-		}, 2000);
-	});
+        });
 
 
 }(jQuery));

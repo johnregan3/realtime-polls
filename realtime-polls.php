@@ -62,11 +62,12 @@ function rt_polls_admin_scripts( ) {
  */
 add_action( 'wp_enqueue_scripts', 'rt_polls_scripts' );
 function rt_polls_scripts( ) {
-	wp_register_style( 'rt-polls-graph', plugins_url( 'css/style.css', __FILE__) );
-	wp_enqueue_style( 'rt-polls-graph' );
 
 	wp_enqueue_script( 'jquery' );
 	wp_enqueue_script( 'heartbeat' );
+
+	wp_register_style( 'rt-polls-style', plugins_url( 'css/style.css', __FILE__) );
+	wp_enqueue_style( 'rt-polls-style' );
 
 	wp_register_script( 'rt-polls-front-end-scripts', plugins_url( 'js/scripts.js', __FILE__), 'jQuery' );
 	wp_enqueue_script( 'rt-polls-front-end-scripts' );
@@ -82,5 +83,5 @@ function rt_polls_scripts( ) {
 	wp_enqueue_script( 'jquery' );
 	wp_enqueue_script( 'heartbeat' );
 
-
 }
+

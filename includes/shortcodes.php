@@ -18,28 +18,19 @@ function rt_polls_shortcode( $atts, $content = null ) {
 	$user    = ( 'user' == $options['votes_user'] ) ? $user_id : $ip ;
 
 	//calculate css
-	foreach ( $options as $option => $val ) {
-		if ( strpos($option, 'label-title-') !== false ) {
-			$labels_array[] = $val;
-		}
-	}
+	$labels_array = RT_POLLS::labels_array( $poll_id );
 
-	$count =  count( $labels_array );
-	$bar_width = 100 / $count;
-	?>
-	<style type="text/css">
-		.bar { width: <?php echo $bar_width; ?>%; ?> }
-
-		<?php $i = 0;
-		foreach( $labels_array as $label ) {
-			$num = $i + 1;
-			echo ".fig" . $i . " { background: " . $options['field-color-' . $num] . "; left: " . $bar_width * $i . "% }\n";
-			$i++;
-		}
+$rt_options = get_option('rt_polls_settings');
+	if ( isset( $rt_options['fancy_styles'] ) && ( 1 == $rt_options['fancy_styles'] ) ) {
 		?>
-
-	</style>
-
+		<style type="text/css">
+		.legendColorBox div {
+			border-radius: 2px;
+			-webkit-border-radius: 2px;
+			-moz-border-radius: 2px;
+		}
+		</style>
+	<?php } ?>
 	<script type="text/javascript">
 	jQuery(document).ready(function () {
 <?php
@@ -63,18 +54,27 @@ $last_key = key($labels_array);
 	echo 'var data_1 = [';
 		foreach ( $labels_array as $label => $val ) :
 	$votes = isset( $options[$val] ) ? $options[$val] : 0 ;
+	$org_color = $options["field-color-" . $i];
+		$gradient = RT_Colors::adjustBrightness( $org_color, -80);
+		$rt_options = get_option('rt_polls_settings');
+			if ( isset( $rt_options['fancy_styles'] ) && 1 == $rt_options['fancy_styles'] ) {
+				$color = "{ colors: [ '" . $org_color . "', '" . $gradient . "'] }";
+			} else {
+				$color = '"' . $org_color . '"';
+			}
+
 			echo '{label: "' . esc_html( $val ) . '",
 			data: dl_' . $i .',
 			bars: {
 				show: true,
-                barWidth: 1,
+                barWidth: .9,
                 fill: true,
                 align: "center",
                 lineWidth: 1,
                 order: ' . $i . ',
-				fillColor: "' . esc_html( $options["field-color-" . $i] ) . '"
-			},
-			color: "' . esc_html( $options["field-color-" . $i] ) . '"
+				fillColor: ' . $color . ',
+				},
+			color: "' . $org_color . '"
 		}';
 		if($label !== $last_key)
 			echo ',';
@@ -85,10 +85,12 @@ endforeach;
 
 
     jQuery.plot(jQuery("#placeholder"), data_1, {
+    	legend: {
+			show: true,
+			container : jQuery('#newlegend')
+		},
         xaxis: {
         	tickLength: '0',
-        	axisLabelFontSizePixels: 12,
-        	axisLabelFontFamily: '"Open Sans", Helvetica, Arial, sans-serif;',
         	ticks: [
         	<?php
         	$i = 0;
@@ -103,13 +105,13 @@ endforeach;
         },
         grid: {
         	borderWidth: 0,
-        },
+        }
        });
 });
 </script>
 	<div id="placeholder" style="width: 100%; height: 400px;">
-
 	</div>
+	<div id="newlegend"></div>
 
 	<div id="rt-poll-vote-area">
 		<select id="rt-vote-select">

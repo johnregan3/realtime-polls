@@ -52,7 +52,7 @@ function polls_add_poll( $data ) {
 
 		foreach ( $data as $key => $value ) {
 			if ( $key != 'realtime-polls-nonce' && $key != 'poll-action' && $key != 'poll-redirect' ) {
-					$posted[ $key ] = $value;
+				$posted[$key] = $value;
 			}
 		}
 				// Set the action code's default status to active
@@ -153,7 +153,7 @@ add_action( 'polls_edit_poll', 'polls_edit_poll' );
  * Checks to see if poll exists
  *
  * @since  1.0
- * @param  int  $poll_id  poll for which to store the data.
+ * @param  int  $poll_id  Poll for which to store the data.
  * @return bool
  */
 function polls_poll_exists( $poll_id ) {
@@ -169,13 +169,12 @@ function polls_poll_exists( $poll_id ) {
  * Checks to see if Poll exists
  *
  * @since  1.0
- * @param  int    $poll_id  poll for which to store the data.
+ * @param  int    $poll_id  Poll for which to store the data.
  * @return object $poll     Post object for requested poll ID.
  */
 function polls_get_poll( $poll_id ) {
 	$poll = get_post( $poll_id );
-
-	if ( get_post_type( $poll->ID ) != 'rt_poll' )
+	if ( isset( $poll->ID ) && ( get_post_type( $poll->ID ) != 'rt_poll' ) )
 		return false;
 
 	return $poll;

@@ -109,6 +109,140 @@ class RT_POLLS {
 
 
 
+	/**
+	 * Create an array of Field Labels
+	 *
+	 * @since  1.0
+	 * @param  array  $poll_id       The ID of the poll being used
+	 * @return array  $labels_array  Array of labels found in this Poll
+	 */
+	public static function labels_array( $poll_id ) {
+			$options = get_post_meta( $poll_id, 'rt_polls_data', true );
+		foreach ( $options as $option => $val ) {
+			if ( ( strpos($option, 'label-title-') !== false ) && ( ! empty( $val ) ) ) {
+				$labels_array[] = $val;
+			}
+		}
+		return $labels_array;
+	}
+
+
+
+	/**
+	 * Generate Javascript information for running Ajax update on Poll graph
+	 *
+	 * @since  1.0
+	 * @param  array   $poll_id  The ID of the poll being used
+	 * @return string  $content  The content of the needed Javascript
+	 */
+	public static function prep_update( $poll_id ) {
+		$options = get_post_meta( $poll_id, 'rt_polls_data', true );
+		$labels_array = RT_POLLS::labels_array( $poll_id );
+		$a = 0;
+		$i = 1;
+		end($labels_array);
+		$last_key = key($labels_array);
+			foreach ( $labels_array as $label => $val ) :
+			$votes = isset( $options[$val] ) ? $options[$val] : 0 ;
+				$sets[] = 'var dl_' . $i . ' = [[' . $a . ', ' . esc_html( $votes ) . ']];';
+				$a++;
+				$i++;
+			endforeach; ?>
+
+			<?php
+			$i = 1;
+				foreach ( $labels_array as $label => $val ) :
+					$votes = isset( $options[$val] ) ? $options[$val] : 0 ;
+						$org_color = $options["field-color-" . $i];
+						$gradient = RT_Colors::adjustBrightness( $org_color, -80);
+						$rt_options = get_option('rt_polls_settings');
+							if ( isset( $rt_options['fancy_styles'] ) && 1 == $rt_options['fancy_styles'] ) {
+								$color = "{ colors: [ '" . $org_color . "', '" . $gradient . "'] }";
+							} else {
+								$color = '"' . $org_color . '"';
+							}
+						if ( $label !== $last_key ) :
+							$ending = ',';
+						else:
+							$ending = '';
+						endif;
+							$datasets[] = '{label: "' . esc_html( $val ) . '",
+							data: dl_' . $i .',
+							bars: {
+								show: true,
+				                barWidth: .9,
+				                fill: true,
+				                align: "center",
+				                lineWidth: 1,
+				                order: ' . $i . ',
+								fillColor: ' . $color . ',
+								},
+							color: "' . $org_color . '"
+						}'.  $ending;
+						$i++;
+				endforeach;
+			?>
+	<?php
+	ob_start();
+		foreach ($sets as $set ) :
+			echo $set . ' ';
+		endforeach;
+			echo ' var data_1 = [';
+		foreach ($datasets as $set ) :
+			echo $set . ' ';
+		endforeach;
+			echo '];';
+	$content = ob_get_contents();
+	ob_end_clean();
+	return $content;
+	}
+
+
+	/**
+	 * Generate Javascript Options information for running Ajax update on Poll graph
+	 *
+	 * @since  1.0
+	 * @param  array   $poll_id  The ID of the poll being used
+	 * @return string  $content  The content of the needed Javascript
+	 */
+	public static function prep_options( $poll_id ) {
+
+	$labels_array = RT_POLLS::labels_array( $poll_id );
+		end($labels_array);
+		$last_key = key($labels_array);
+		ob_start(); ?>
+		var options = {
+					legend: {
+						show: true,
+						container : jQuery('#newlegend')
+					},
+			        xaxis: {
+			        	tickLength: '0',
+
+			        	ticks: [
+			        	<?php
+			        	$i = 0;
+			        	foreach ( $labels_array as $label => $val ) : ?>
+			        		[<?php echo $i; ?>, ""]
+			        		<?php
+			        		if($label !== $last_key)
+								echo ', ';
+							$i++;
+			        	endforeach;
+			        	?>],
+			        },
+			        grid: {
+			        	borderWidth: 0,
+			        }
+			    };
+			<?php
+			$content = ob_get_contents();
+			ob_end_clean();
+			return $content;
+	}
+
+
+
 
 	/**
 	 * Save the Vote, and then, on success, return a message
@@ -143,8 +277,8 @@ class RT_POLLS {
 
 		$result = update_post_meta( $poll_id, 'rt_polls_data', $poll_meta );
 		$message = $result ? "Vote Successful.  Thank you for participating." : "Vote Failed.  Please try again.";
-		$info['updatedlabel'] = $selection_label;
-		$info['updatedid'] = $selection;
+		$info['data_1'] = RT_POLLS::prep_update( $poll_id );
+		$info['options'] = RT_POLLS::prep_options( $poll_id );
 		$info['message'] = $message;
 		$json_result = json_encode( $info );
 		echo $json_result;
@@ -162,6 +296,7 @@ class RT_POLLS {
 add_action( 'wp_ajax_rt_poll_process', 'rt_poll_process' );
 
 add_action( 'wp_ajax_nopriv_rt_poll_process', 'rt_poll_must_login' );
+
 
 
 /**
@@ -200,6 +335,36 @@ function rt_poll_must_login() {
 
 }
 
+class RT_Colors {
+
+	public static function adjustBrightness($hex, $steps) {
+	    // Steps should be between -255 and 255. Negative = darker, positive = lighter
+	    $steps = max(-255, min(255, $steps));
+
+	    // Format the hex color string
+	    $hex = str_replace('#', '', $hex);
+	    if (strlen($hex) == 3) {
+	        $hex = str_repeat(substr($hex,0,1), 2).str_repeat(substr($hex,1,1), 2).str_repeat(substr($hex,2,1), 2);
+	    }
+
+	    // Get decimal values
+	    $r = hexdec(substr($hex,0,2));
+	    $g = hexdec(substr($hex,2,2));
+	    $b = hexdec(substr($hex,4,2));
+
+	    // Adjust number of steps and keep it inside 0 to 255
+	    $r = max(0,min(255,$r + $steps));
+	    $g = max(0,min(255,$g + $steps));
+	    $b = max(0,min(255,$b + $steps));
+
+	    $r_hex = str_pad(dechex($r), 2, '0', STR_PAD_LEFT);
+	    $g_hex = str_pad(dechex($g), 2, '0', STR_PAD_LEFT);
+	    $b_hex = str_pad(dechex($b), 2, '0', STR_PAD_LEFT);
+
+	    return '#'.$r_hex.$g_hex.$b_hex;
+	}
+
+}
 
 
 /**
@@ -208,15 +373,17 @@ function rt_poll_must_login() {
  * @since 1.0
  */
 // Modify the data that goes back with the heartbeat-tick
+
 function rt_polls_heartbeat_received( $response, $data ) {
 
-	// Make sure we only run our query if the rt_polls_heartbeat key is present
-	if( $data['rt_polls_heartbeat'] == 'graph_update' ) {
+    // Make sure we only run our query if the edd_heartbeat key is present
+    if( $data['rt_polls_heartbeat'] == 'graph_update' ) {
 
-		// Send back the number of complete payments
-		$response['graph-percentage'] = number_format_i18n( $payments->publish );
+		$info['data_1'] = RT_POLLS::prep_update( $data['poll_id'] );
+		$info['options'] = RT_POLLS::prep_options( $data['poll_id'] );
 
-	}
-	return $response;
+        $response['poll_data'] = $info;
+    }
+    return $response;
 }
 add_filter( 'heartbeat_received', 'rt_polls_heartbeat_received', 10, 2 );
