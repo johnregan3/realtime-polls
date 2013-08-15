@@ -3,9 +3,6 @@
 // Wait for the DOM to load everything, just to be safe
 $(document).ready(function() {
 
-	//speed up heartbeat
-	wp.heartbeat.interval( 'fast' );
-
 	$("#rt-poll-button").click( function() {
 
 		user      = $(this).attr("data-user");

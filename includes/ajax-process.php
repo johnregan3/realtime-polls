@@ -16,7 +16,7 @@ class RT_POLLS {
 	 * @param  array   $poll_meta  Array of data from the Poll's meta row
 	 * @return string  $limit      User's selection of time limit
 	 */
-	public static function get_limit( $poll_meta ) {
+	static function get_limit( $poll_meta ) {
 		$limits = array( 1, 5, 10, 25 );
 		foreach ( $limits as $limit ) {
 			if ( $poll_meta['votes_number'] == $limit ) {
@@ -37,7 +37,7 @@ class RT_POLLS {
 	 * @param  array  $poll_meta   Array of data from the Poll's meta row
 	 * @return int    $time_limit  Number of seconds within the time limit set by user.
 	 */
-	public static function get_time_limit( $poll_meta ) {
+	static function get_time_limit( $poll_meta ) {
 		$times = array( 'hour', 'day', 'week', 'month' );
 		if (  in_array( $poll_meta['votes_time'], $times ) == true ) {
 			if ( $poll_meta['votes_time'] == 'hour' )
@@ -75,7 +75,7 @@ class RT_POLLS {
 	 * @param  array   $poll_meta   Array of data from the Poll's meta row
 	 * @return mixed   Either exit function and die, or simply return
 	 */
-	public static function check_vote_limit( $user, $limit = null, $time, $time_limit = null, $poll_meta ) {
+	static function check_vote_limit( $user, $limit = null, $time, $time_limit = null, $poll_meta ) {
 		if ( isset( $limit ) && isset( $time_limit ) && isset( $poll_meta[$user] ) ) {
 
 		$time_ago = $time - $time_limit;
@@ -116,7 +116,7 @@ class RT_POLLS {
 	 * @param  array  $poll_id       The ID of the poll being used
 	 * @return array  $labels_array  Array of labels found in this Poll
 	 */
-	public static function labels_array( $poll_id ) {
+	static function labels_array( $poll_id ) {
 			$options = get_post_meta( $poll_id, 'rt_polls_data', true );
 		foreach ( $options as $option => $val ) {
 			if ( ( strpos($option, 'label-title-') !== false ) && ( ! empty( $val ) ) ) {
@@ -135,7 +135,7 @@ class RT_POLLS {
 	 * @param  array   $poll_id  The ID of the poll being used
 	 * @return string  $content  The content of the needed Javascript
 	 */
-	public static function prep_update( $poll_id ) {
+	static function prep_coordinates( $poll_id ) {
 		$options = get_post_meta( $poll_id, 'rt_polls_data', true );
 		$labels_array = RT_POLLS::labels_array( $poll_id );
 		$a = 0;
@@ -144,12 +144,24 @@ class RT_POLLS {
 		$last_key = key($labels_array);
 			foreach ( $labels_array as $label => $val ) :
 			$votes = isset( $options[$val] ) ? $options[$val] : 0 ;
-				$sets[] = 'var dl_' . $i . ' = [[' . $a . ', ' . esc_html( $votes ) . ']];';
+				$sets[] = 'var dl_' . $i . ' = [[' . $a . ', ' . esc_html( $votes ) . ']]; ';
 				$a++;
 				$i++;
-			endforeach; ?>
+			endforeach;
+		ob_start();
+		foreach($sets as $set):
+			echo $set;
+		endforeach;
+		$content = ob_get_contents();
+		ob_end_clean();
+		return $content;
+	}
 
-			<?php
+	static function prep_data( $poll_id ) {
+		$options = get_post_meta( $poll_id, 'rt_polls_data', true );
+		$labels_array = RT_POLLS::labels_array( $poll_id );
+		end($labels_array);
+		$last_key = key($labels_array);
 			$i = 1;
 				foreach ( $labels_array as $label => $val ) :
 					$votes = isset( $options[$val] ) ? $options[$val] : 0 ;
@@ -185,16 +197,13 @@ class RT_POLLS {
 								fillColor: ' . $color . ',
 								},
 							color: "' . $org_color . '"
-						}'.  $ending;
+						}'.  $ending . ' ';
 						$i++;
 				endforeach;
 			?>
 	<?php
 	ob_start();
-		foreach ($sets as $set ) :
-			echo $set . ' ';
-		endforeach;
-			echo ' var data_1 = [';
+		echo '[';
 		foreach ($datasets as $set ) :
 			echo $set . ' ';
 		endforeach;
@@ -212,42 +221,62 @@ class RT_POLLS {
 	 * @param  array   $poll_id  The ID of the poll being used
 	 * @return string  $content  The content of the needed Javascript
 	 */
-	public static function prep_options( $poll_id ) {
+	static function prep_options( $poll_id ) {
 
 	$labels_array = RT_POLLS::labels_array( $poll_id );
 		end($labels_array);
 		$last_key = key($labels_array);
-		ob_start(); ?>
-		var options = {
-					legend: {
+		$i = 0;
+		foreach ( $labels_array as $label => $val ) :
+			if($label !== $last_key) {
+				$ending = ', ';
+    			$ticks[] = "[" . $i . ", '']" . $ending;
+    		}
+			$i++;
+    	endforeach;
+
+
+					$content=	"legend: {
 						show: true,
-						container : jQuery('#newlegend')
+						container: jQuery('#newlegend'),
 					},
 			        xaxis: {
 			        	tickLength: '0',
 
-			        	ticks: [
-			        	<?php
-			        	$i = 0;
-			        	foreach ( $labels_array as $label => $val ) : ?>
-			        		[<?php echo $i; ?>, ""]
-			        		<?php
-			        		if($label !== $last_key)
-								echo ', ';
-							$i++;
-			        	endforeach;
-			        	?>],
+			        	ticks: [ ";
+
+			        $content2 = "]
 			        },
 			        grid: {
-			        	borderWidth: 0,
-			        }
-			    };
-			<?php
-			$content = ob_get_contents();
+			        	borderWidth: 0
+			        }";
+			ob_start();
+				echo $content;
+				foreach ( $ticks as $tick ) :
+	        		echo $tick;
+	        	endforeach;
+				echo $content2;
+				$content = ob_get_contents();
 			ob_end_clean();
 			return $content;
 	}
 
+
+
+	/**
+	 *
+	 *
+	 * @since  1.0
+	 * @param  array   $poll_id  The ID of the poll being used
+	 * @return string
+	 */
+	static function combine_data( $poll_id ){
+		$js_coordinates = RT_POLLS::prep_coordinates( $poll_id );
+		$js_data = RT_POLLS::prep_data( $poll_id );
+		$return = $js_coordinates . '
+		  var data_1 = ' . $js_data;
+		return $return;
+	}
 
 
 
@@ -267,7 +296,7 @@ class RT_POLLS {
 	 * @param  string  $time       Current time
 	 * @return void
 	 */
-	public static function save_vote( $poll_id, $poll_meta, $selection, $user, $time ) {
+	static function save_vote( $poll_id, $poll_meta, $selection, $user, $time ) {
 		//Cycle through fields, find a match and add one to the score.
 		foreach( $poll_meta as $field => $val ) {
 			if ( $selection == $field ) {
@@ -284,8 +313,10 @@ class RT_POLLS {
 
 		$result = update_post_meta( $poll_id, 'rt_polls_data', $poll_meta );
 		$message = $result ? "Vote Successful.  Thank you for participating." : "Vote Failed.  Please try again.";
-		$info['data_1'] = RT_POLLS::prep_update( $poll_id );
-		$info['options'] = RT_POLLS::prep_options( $poll_id );
+		$js_data = RT_POLLS::combine_data( $poll_id );
+		$info['data_1'] = $js_data;
+		$js_options = RT_POLLS::prep_options( $poll_id );
+		$info['options'] = "var options = {" . $js_options . "}";
 		$info['message'] = $message;
 		$json_result = json_encode( $info );
 		echo $json_result;
