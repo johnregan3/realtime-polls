@@ -1,13 +1,13 @@
 <?php
 
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * Content of the Add Poll Page
  *
  * @since 1.0
  */
-
-// Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) exit;
 
 
 /**

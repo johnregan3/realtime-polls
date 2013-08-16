@@ -1,7 +1,11 @@
 
 (function ($) {
+
+
 // Wait for the DOM to load everything, just to be safe
 $(document).ready(function() {
+
+	wp.heartbeat.interval( 'fast' );
 
 	$("#rt-poll-button").click( function() {
 
@@ -15,24 +19,13 @@ $(document).ready(function() {
 			dataType : "json",
 			url : rt_polls_ajax.ajaxurl,
 			data : { action: "rt_poll_process", user : user, nonce : nonce, poll_id : poll_id, selection : selection },
-			beforeSend: function() {
-					$(this).attr( "disabled", "disabled" );
-
-					//spinner
-			},
-			complete: function() {
-					//if limit reached, do not re-enable.  send a message.
-					$(this).removeAttr( "disabled" );
-					//spinner
-			},
 			success: function(response) {
-				$('#message-area').html(response.message)
+				$('#message-area').html(response.message);
 				eval(response.data_1);
 				eval(response.options);
-
-			    jQuery.plot( jQuery( "#placeholder" ), data_1, options );
-
+			 	$.plot( $( "#placeholder" ), data_1, options );
 			},
+
 			error: function(jqXHR, textStatus, errorThrown) {
 				console.log(jqXHR);
 				console.log(textStatus);
@@ -54,21 +47,23 @@ $(document).ready(function() {
  *          johnregan3.me
  *          @johnregan3
  */
-		$(document).on('heartbeat-send', function(e, data) {
-            data['rt_polls_heartbeat'] = 'graph_update';
-            data['poll_id'] = $("#rt-poll-button").attr('data-poll');
-        });
+$(document).on('heartbeat-send', function(e, data) {
+	data['rt_polls_heartbeat'] = 'graph_update';
+	data['poll_id'] = $("#rt-poll-button").attr('data-poll');
+});
 
-        // Listen for the custom event "heartbeat-tick" on $(document).
-        $(document).on( 'heartbeat-tick', function(e, data) {
+// Listen for the custom event "heartbeat-tick" on $(document).
+$(document).on( 'heartbeat-tick', function(e, data) {
 
-				eval(data['poll_data'].data_1);
-				eval(data['poll_data'].options);
+	console.log("Test");
 
-			    jQuery.plot( jQuery( "#placeholder" ), data_1, options );
+	eval(data['poll_data'].data_1);
+	eval(data['poll_data'].options);
+
+	$.plot( $( "#placeholder" ), data_1, options );
 
 
-        });
+});
 
 
 }(jQuery));

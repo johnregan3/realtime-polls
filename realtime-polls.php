@@ -52,7 +52,7 @@ function rt_polls_admin_scripts( ) {
 
 	wp_register_script( 'rt-polls-scripts', plugins_url( 'js/scripts-admin.js', __FILE__) );
 	wp_enqueue_script( 'rt-polls-scripts' );
-	wp_enqueue_script( 'my-script-handle', plugins_url( __FILE__ ), array( 'wp-color-picker' ), false, true );
+	wp_enqueue_script( 'wp-color-picker', plugins_url( __FILE__ ), array( 'wp-color-picker' ), false, true );
 }
 
 /**
@@ -63,25 +63,23 @@ function rt_polls_admin_scripts( ) {
 add_action( 'wp_enqueue_scripts', 'rt_polls_scripts' );
 function rt_polls_scripts( ) {
 
+	global $is_IE;
+	if ( $is_IE ) {
+	    wp_enqueue_script( 'excanvas', plugins_url( 'js/flot/excanvas.js', __FILE__), 'jQuery' );
+	}
+
 	wp_enqueue_script( 'jquery' );
 	wp_enqueue_script( 'heartbeat' );
 
 	wp_register_style( 'rt-polls-style', plugins_url( 'css/style.css', __FILE__) );
 	wp_enqueue_style( 'rt-polls-style' );
 
-	wp_register_script( 'rt-polls-front-end-scripts', plugins_url( 'js/scripts.js', __FILE__), 'jQuery' );
-	wp_enqueue_script( 'rt-polls-front-end-scripts' );
-
-	wp_register_script( 'rt-polls-flot', plugins_url( 'js/flot/jQuery.flot.js', __FILE__), 'jQuery' );
+	wp_register_script( 'rt-polls-flot', plugins_url( 'js/flot/jQuery.flot.custom.js', __FILE__), 'jQuery' );
 	wp_enqueue_script( 'rt-polls-flot' );
 
 	wp_register_script( 'vote-process', plugins_url( 'js/vote-process.js', __FILE__) );
 	wp_localize_script( 'vote-process', 'rt_polls_ajax', array( 'ajaxurl' => admin_url( 'admin-ajax.php' )));
 	wp_enqueue_script( 'vote-process' );
-
-
-	wp_enqueue_script( 'jquery' );
-	wp_enqueue_script( 'heartbeat' );
 
 }
 

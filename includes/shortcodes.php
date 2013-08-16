@@ -1,5 +1,8 @@
 <?php
 
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * Generate Poll Shortcode
  *
@@ -45,17 +48,7 @@ class RT_Polls_Shortcode {
 	$user    = ( 'user' == $options['votes_user'] ) ? $user_id : $ip ;
 	$rt_options = get_option('rt_polls_settings');
 
-	$labels_array = RT_POLLS::labels_array( $poll_id );
-
-	if ( isset( $rt_options['fancy_styles'] ) && ( 1 == $rt_options['fancy_styles'] ) ) { ?>
-		<style type="text/css">
-			.legendColorBox div {
-				border-radius: 2px;
-				-webkit-border-radius: 2px;
-				-moz-border-radius: 2px;
-			}
-		</style>
-	<?php } ?>
+	$labels_array = RT_POLLS::labels_array( $poll_id ); ?>
 
 	<script type="text/javascript">
 	<?php

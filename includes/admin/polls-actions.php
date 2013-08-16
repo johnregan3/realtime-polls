@@ -1,5 +1,8 @@
 <?php
 
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * Functions used by Polls admin page
  *
@@ -79,10 +82,11 @@ function polls_store_poll( $details, $poll_id = null ) {
 
 	//Set up Metadata array
 	$meta = array();
-	$meta['orientation']  = isset( $details['orientation'] )  ? $details['orientation']  : 'Vertical';
 	$meta['votes_number'] = isset( $details['votes_number'] ) ? $details['votes_number'] : 'unlimited';
 	$meta['votes_user']   = isset( $details['votes_user'] )   ? $details['votes_user']   : 'ip';
 	$meta['votes_time']   = isset( $details['votes_time'] )   ? $details['votes_time']   : 'ever';
+
+
 	//Add Label and Color fields
 	$numbers = array( 1, 2, 3, 4, 5, 6 );
 	$fields = array( 'label-title-', 'field-color-' );
@@ -92,15 +96,21 @@ function polls_store_poll( $details, $poll_id = null ) {
 		}
 	}
 
+	//var_dump($meta);
+
 	if ( polls_poll_exists( $poll_id ) && ! empty( $poll_id ) ) {
 		// Update an existing poll
+
+		$existing_meta = get_post_meta( $poll_id, 'rt_polls_data', true);
+		$new_meta = $meta + $existing_meta ;
 
 		wp_update_post( array(
 			'ID'          => $poll_id,
 			'post_title'  => $details['name'],
 		) );
 
-		update_post_meta( $poll_id, 'rt_polls_data', $meta );
+		update_post_meta( $poll_id, 'rt_polls_data', $new_meta);
+
 
 		// poll updated
 		return true;
@@ -113,7 +123,7 @@ function polls_store_poll( $details, $poll_id = null ) {
 			'post_status' => 'publish',
 		) );
 
-		update_post_meta( $poll_id, 'rt_polls_data', $meta );
+			update_post_meta( $poll_id, 'rt_polls_data', $meta);
 
 		// poll created
 		return true;

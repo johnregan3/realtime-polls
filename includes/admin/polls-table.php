@@ -1,13 +1,13 @@
 <?php
 
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * rt_polls WP Actions Table
  *
  * @since  1.0
  */
-
-// Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) exit;
 
 // Load WP_List_Table if not loaded
 if ( ! class_exists( 'WP_List_Table' ) ) {
