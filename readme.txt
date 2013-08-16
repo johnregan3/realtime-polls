@@ -48,9 +48,17 @@ Find more help at the [Simple Custom CSS Wiki](https://github.com/johnregan3/sim
 
 Sorry, this plugin is available for use only on self-hosted (WordPress.org) websites.
 
+= What browsers are compatible with Realtime Polls? =
+
+Currently every modern browser, including IE 6+.
+
 = Can I change the font on the x or y axes =
 
 Not currently, but watch for that in an upcoming release.
+
+= Do I have to have six fields in each Poll? =
+
+No way! Just leave a field blank to leave it out of the poll.
 
  = How do I change the colors of the bars? =
 
