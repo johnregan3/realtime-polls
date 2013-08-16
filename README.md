@@ -10,4 +10,15 @@ This plugin utilizes the WordPress Heartbeat API to continually update the user'
 - Easily Configured
 - Realtime Updating via WordPress Heartbeat API
 - Generates no CSS Files
-- Thorough documentation***This Plugin is under development and not ready for release***
+- Thorough documentation***This Plugin is under development and not ready for release***å
+
+The shining feature of this WordPress Plugin is its ability to show updates to the user in realtime, meaning they can view the progress of the polls from around the world in realtime!
+
+***WIki Sections***
+
+[General Settings]( https://github.com/johnregan3/realtime-polls/wiki/General-Options, "General Settings")
+
+[Polls Settings]( https://github.com/johnregan3/realtime-polls/wiki/Polls-Settings-Page, "Polls Settings")
+
+[Frequently Asked Questions (FAQ)](https://github.com/johnregan3/realtime-polls/wiki/FAQ "Frequently Asked Questions")å
+åç
