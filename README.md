@@ -1,4 +1,4 @@
-Realtime Polls WordPress Plugin
+![Realtime Polls WordPress Plugin](https://github.com/johnregan3/realtime-polls/blob/master/img/graph-icon.png) Realtime Polls WordPress Plugin
 =================
 An easy-to-use Polls plugin for conducting polls that update quickly, displaying the latest updates for the user.
 
