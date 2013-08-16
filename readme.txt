@@ -76,7 +76,13 @@ Currently, all graphs must have the same orientation, meaning that all must be H
 
 == Screenshots ==
 
-1. The Realitime Polls Administration Screen
+1. The Realitime Polls General Settings Screen
+
+2. The Realitime Polls Administration Screen
+
+3. Add/Edit Poll Screen
+
+4. Front End Display
 
 == Changelog ==
 

@@ -2,7 +2,7 @@
 
 /**
  * Plugin Name: Realtime Polls
- * Plugin URI:
+ * Plugin URI: http://johnregan3.github.io/realtime-polls
  * Description: Create Polls that update in realtime!
  * Author: John Regan
  * Author URI: http://johnregan3.me

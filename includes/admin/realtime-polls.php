@@ -56,6 +56,7 @@ function polls_render_submenu_page(){
 				<br />
 			</div>
 			<h2><?php _e( 'Realtime Polls', 'rt_polls' ); ?><a href="<?php echo add_query_arg( array( 'poll-action' => 'add_poll' ) ); ?>" class="add-new-h2">Add New</a></h2>
+			<p><a href="https://github.com/johnregan3/realtime-polls/wiki/Polls-Settings-Page">Get Help for this page on our Wiki</a>.
 			<form id="polls-items-filter" method="get" action="<?php echo admin_url( 'admin.php?page=realtime-polls.php&post-type=rt_poll' ); ?>">
 				<input type="hidden" name="post_type" value="rt_poll" />
 				<input type="hidden" name="page" value="realtime-polls.php" />

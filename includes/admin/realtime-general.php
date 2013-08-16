@@ -75,7 +75,7 @@ function rt_polls_general_settings() {
 				<p><?php _e('Settings saved.') ?></p>
 			</div>
 		<?php } ?>
-		<p><a href="#"><?php _e( 'Get help for this page on our Wiki', 'rt_polls' ) ?></a>.</p>
+		<p><a href="https://github.com/johnregan3/realtime-polls/wiki/General-Options"><?php _e( 'Get help for this page on our Wiki', 'rt_polls' ) ?></a>.</p>
 		<form method="post" action="options.php" enctype="multipart/form-data">
 			<?php settings_fields( 'rt_polls_settings_group' ); ?>
 			<?php do_settings_sections( __FILE__ ); ?>
