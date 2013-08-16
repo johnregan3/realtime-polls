@@ -20,5 +20,4 @@ The shining feature of this WordPress Plugin is its ability to show updates to t
 
 [Polls Settings]( https://github.com/johnregan3/realtime-polls/wiki/Polls-Settings-Page, "Polls Settings")
 
-[Frequently Asked Questions (FAQ)](https://github.com/johnregan3/realtime-polls/wiki/FAQ "Frequently Asked Questions")å
-åç
+[Frequently Asked Questions (FAQ)](https://github.com/johnregan3/realtime-polls/wiki/FAQ "Frequently Asked Questions")
