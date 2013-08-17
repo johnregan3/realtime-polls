@@ -34,6 +34,19 @@ class RT_POLLS {
 
 
 	/**
+	 * Fetch the Plugin's general settings.
+	 *
+	 * @since  1.0
+	 * @return array  $settings  Array of settings data
+	 */
+	static function setting( $field ) {
+		$settings = get_option('rt_polls_settings');
+		$setting = $settings[$field];
+		return $setting;
+	}
+
+
+	/**
 	 * Get the number of seconds within the time limit set by user.
 	 *
 	 * @since  1.0
@@ -81,9 +94,9 @@ class RT_POLLS {
 	static function check_vote_limit( $user, $limit = null, $time, $time_limit = null, $poll_meta ) {
 		if ( isset( $limit ) && isset( $time_limit ) && isset( $poll_meta[$user] ) ) {
 
-		$time_ago = $time - $time_limit;
-		$votes_submitted = '';
-		$user_votes_array = $poll_meta[$user];
+			$time_ago = $time - $time_limit;
+			$votes_submitted = '';
+			$user_votes_array = $poll_meta[$user];
 
 			if ( $user_votes_array ) {
 				foreach ( $user_votes_array as $timestamp => $value ) {
@@ -100,13 +113,13 @@ class RT_POLLS {
 		}
 		if ( isset( $votes_submitted ) && $votes_submitted >= $limit ) {
 
-			$info['message'] = "Your vote limit has been reached.  Please try again later." ;
+			$info['message'] = RT_Polls::setting( 'failure_message' );
 			$json_result = json_encode( $info );
 			echo $json_result;
-			die();
+			return false;
 
 		} else {
-			return;
+			return true;
 		}
 	}
 
@@ -120,7 +133,7 @@ class RT_POLLS {
 	 * @return array  $labels_array  Array of labels found in this Poll
 	 */
 	static function labels_array( $poll_id ) {
-			$options = get_post_meta( $poll_id, 'rt_polls_data', true );
+		$options = get_post_meta( $poll_id, 'rt_polls_data', true );
 		foreach ( $options as $option => $val ) {
 			if ( ( strpos($option, 'label-title-') !== false ) && ( ! empty( $val ) ) ) {
 				$labels_array[] = $val;
@@ -140,19 +153,18 @@ class RT_POLLS {
 	 */
 	static function prep_coordinates( $poll_id ) {
 		$options = get_post_meta( $poll_id, 'rt_polls_data', true );
-		$rt_options = get_option('rt_polls_settings');
 		$labels_array = RT_POLLS::labels_array( $poll_id );
 		$a = 0;
 		$i = 1;
 		end($labels_array);
 		$last_key = key($labels_array);
 			foreach ( $labels_array as $label => $val ) :
-			$votes = isset( $options[$val] ) ? $options[$val] : 0 ;
-			if( 'horizontal' == $rt_options['graph_orientation'] ) :
-				$sets[] = 'var dl_' . $i . ' = [[' . esc_html( $votes ) . ', ' . $a . ']]; ';
-			else :
-				$sets[] = 'var dl_' . $i . ' = [[' . $a . ', ' . esc_html( $votes ) . ']]; ';
-			endif;
+				$votes = isset( $options[$val] ) ? $options[$val] : 0 ;
+				if( 'horizontal' == RT_Polls::setting( 'graph_orientation' ) ) :
+					$sets[] = 'var dl_' . $i . ' = [[' . $votes . ', ' . $a . ']]; ';
+				else :
+					$sets[] = 'var dl_' . $i . ' = [[' . $a . ', ' . $votes . ']]; ';
+				endif;
 				$a++;
 				$i++;
 			endforeach;
@@ -175,33 +187,29 @@ class RT_POLLS {
 	 */
 	static function prep_data( $poll_id ) {
 		$options = get_post_meta( $poll_id, 'rt_polls_data', true );
-		$rt_options = get_option('rt_polls_settings');
 		$labels_array = RT_POLLS::labels_array( $poll_id );
 		end($labels_array);
 		$last_key = key($labels_array);
 			$i = 1;
 			foreach ( $labels_array as $label => $val ) :
 				$votes = isset( $options[$val] ) ? $options[$val] : 0 ;
-				$horizontal = ( 'horizontal' == $rt_options['graph_orientation'] ) ? 'horizontal : true,' : '';
+				$horizontal = ( 'horizontal' == RT_Polls::setting( 'graph_orientation' ) ) ? 'horizontal : true,' : '';
 				$ending = ( $label !== $last_key ) ? ', ' : '';
 				$color = $options["field-color-" . $i];
 
-				$datasets[] = '{label: "' . esc_html( $val ) . '",
-					data: dl_' . $i .',
-					bars: { show: true, ' . $horizontal . ' fill: true, align: "center", lineWidth: 1, order: ' . $i . ', fillColor: "' . $color . '" },
-					color: "' . $color . '"
-					}'.  $ending . ' ';
+				$datasets[] = '{label: "' . esc_html( $val ) . '", data: dl_' . $i .',
+					bars: { show: true, ' . $horizontal . ' fill: true, align: "center", lineWidth: 1, order: ' . $i . ', fillColor: "' . $color . '" }, color: "' . $color . '" }'.  $ending . ' ';
 				$i++;
 			endforeach;
-	ob_start();
-		echo '[';
-		foreach ($datasets as $set ) :
-			echo $set . ' ';
-		endforeach;
-		echo '];';
-	$content = ob_get_contents();
-	ob_end_clean();
-	return $content;
+		ob_start();
+			echo '[';
+			foreach ($datasets as $set ) :
+				echo $set . ' ';
+			endforeach;
+			echo '];';
+		$content = ob_get_contents();
+		ob_end_clean();
+		return $content;
 	}
 
 
@@ -213,7 +221,6 @@ class RT_POLLS {
 	 * @return string  $content  The content of the needed Javascript
 	 */
 	static function prep_options( $poll_id ) {
-	$rt_options = get_option('rt_polls_settings');
 	$labels_array = RT_POLLS::labels_array( $poll_id );
 		end($labels_array);
 		$last_key = key($labels_array);
@@ -223,8 +230,8 @@ class RT_POLLS {
 			$ticks[] = "[" . $i . ", '']" . $ending;
 			$i++;
 		endforeach;
-		$content=	"legend: { show: true, container: jQuery('#newlegend') },";
-		if( 'horizontal' == $rt_options['graph_orientation'] ) :
+		$content=	"legend: { show: true, container: jQuery('#rt-legend') },";
+		if( 'horizontal' == RT_Polls::setting( 'graph_orientation' ) ) :
 			$axis = "bars: { horizontal: true }, yaxis: { tickLength: '0', ticks: [ ";
 		else :
 			$axis = "xaxis: { tickLength: '0', ticks: [ ";
@@ -294,12 +301,14 @@ class RT_POLLS {
 		}
 
 		$result = update_post_meta( $poll_id, 'rt_polls_data', $poll_meta );
-		$message = $result ? "Vote Successful.  Thank you for participating." : "Vote Failed.  Please try again.";
+
+		$message = $result ? RT_Polls::setting( 'success_message' ) : "Vote Failed.";
+			$info['message'] = esc_html( $message );
 		$js_data = RT_POLLS::combine_data( $poll_id );
-		$info['data_1'] = $js_data;
+			$info['data_1'] = esc_html( $js_data );
 		$js_options = RT_POLLS::prep_options( $poll_id );
-		$info['options'] = "var options = {" . $js_options . "}";
-		$info['message'] = $message;
+			$info['options'] = "var options = {" . esc_html( $js_options ) . "}";
+
 		$json_result = json_encode( $info );
 		echo $json_result;
 		die();
@@ -307,8 +316,11 @@ class RT_POLLS {
 
 }
 
+
+
+
 /**
- * Process Votes
+ * Process Votes via AJAX
  *
  * @since 1.0
  */
@@ -316,8 +328,6 @@ class RT_POLLS {
 add_action( 'wp_ajax_rt_poll_process', 'rt_poll_process' );
 
 add_action( 'wp_ajax_nopriv_rt_poll_process', 'rt_poll_must_login' );
-
-
 
 /**
  * Receive and save Vote data.
@@ -341,10 +351,12 @@ function rt_poll_process() {
 	$time_limit = RT_POLLS::get_time_limit( $poll_meta );
 
 	//Check to see if limit reached.  If so, exit.  If not, proceed.
-	RT_POLLS::check_vote_limit( $user, $limit, $time, $time_limit, $poll_meta );
+	$limit_check = RT_POLLS::check_vote_limit( $user, $limit, $time, $time_limit, $poll_meta );
 
+	if( $limit_check == true ) {
 	//Save the Vote, and, on success, return a message
-	RT_POLLS::save_vote( $poll_id, $poll_meta, $selection, $user, $time );
+		RT_POLLS::save_vote( $poll_id, $poll_meta, $selection, $user, $time );
+	}
 
 }
 
@@ -355,44 +367,16 @@ function rt_poll_must_login() {
 
 }
 
-class RT_Colors {
-
-	public static function adjustBrightness($hex, $steps) {
-		// Steps should be between -255 and 255. Negative = darker, positive = lighter
-		$steps = max(-255, min(255, $steps));
-
-		// Format the hex color string
-		$hex = str_replace('#', '', $hex);
-		if (strlen($hex) == 3) {
-			$hex = str_repeat(substr($hex,0,1), 2).str_repeat(substr($hex,1,1), 2).str_repeat(substr($hex,2,1), 2);
-		}
-
-		// Get decimal values
-		$r = hexdec(substr($hex,0,2));
-		$g = hexdec(substr($hex,2,2));
-		$b = hexdec(substr($hex,4,2));
-
-		// Adjust number of steps and keep it inside 0 to 255
-		$r = max(0,min(255,$r + $steps));
-		$g = max(0,min(255,$g + $steps));
-		$b = max(0,min(255,$b + $steps));
-
-		$r_hex = str_pad(dechex($r), 2, '0', STR_PAD_LEFT);
-		$g_hex = str_pad(dechex($g), 2, '0', STR_PAD_LEFT);
-		$b_hex = str_pad(dechex($b), 2, '0', STR_PAD_LEFT);
-
-		return '#'.$r_hex.$g_hex.$b_hex;
-	}
-
-}
 
 
 /**
  * Use Heartbeat API to update graph bars
  *
  * @since 1.0
+ * @param array   $response
+ * @param array   $data      Information sent from heartbeat-send
+ * @return array  $response  Infomation sent back to heartbeat-tick
  */
-// Modify the data that goes back with the heartbeat-tick
 
 function rt_polls_heartbeat_received( $response, $data ) {
 
@@ -400,9 +384,9 @@ function rt_polls_heartbeat_received( $response, $data ) {
 	if( $data['rt_polls_heartbeat'] == 'graph_update' ) {
 
 		$js_data = RT_POLLS::combine_data( $data['poll_id'] );
-		$info['data_1'] = $js_data;
+			$info['data_1'] = $js_data;
 		$js_options = RT_POLLS::prep_options( $data['poll_id'] );
-		$info['options'] = "var options = {" . $js_options . "}";
+			$info['options'] = "var options = {" . $js_options . "}";
 
 		$response['poll_data'] = $info;
 	}

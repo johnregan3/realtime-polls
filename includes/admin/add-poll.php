@@ -21,7 +21,7 @@ $defaults = get_option('rt_polls_settings');
 	<div class="icon32" id="rt-polls-icon">
 		<br />
 	</div>
-	<h2><?php _e( 'Add New Poll', 'rt_polls' ); ?>&nbsp;&nbsp;&nbsp;<a href="<?php echo admin_url( 'admin.php?page=realtime-polls.php&post_type=rt_poll' ); ?>" class="button-secondary"><?php _e( 'Go Back', 'rt_polls' ); ?></a></h2>
+	<h2><?php _e( 'Add New Poll', 'rt_polls' ); ?>&nbsp;&nbsp;&nbsp;<a href="<?php echo admin_url( 'admin.php?page=tr-polls.php&post_type=rt_poll' ); ?>" class="button-secondary"><?php _e( 'Go Back', 'rt_polls' ); ?></a></h2>
 	<form id="rew-add-item" action="" method="POST">
 		<table class="form-table">
 			<tbody>
@@ -50,7 +50,7 @@ $defaults = get_option('rt_polls_settings');
 				</tr>
 				<tr class="form-field">
 					<th scope="row" valign="top">
-						<label for="limit-votes"><?php _e( 'Limit Votes', 'rt_polls' ); ?></label>
+						<label for="limit-votes"><?php _e( 'Vote Limit', 'rt_polls' ); ?></label>
 					</th>
 					<td>
 						<select name="votes_number">
@@ -60,7 +60,7 @@ $defaults = get_option('rt_polls_settings');
 							<option value="25" <?php if ( $defaults['default_restriction']['votes_number'] == 25 ) echo 'selected="selected"'; ?>>25</option>
 							<option value="unlimited" <?php if ( $defaults['default_restriction']['votes_number'] == 'unlimited' ) echo 'selected="selected"'; ?>>Unlimited</option>
 						</select>
-						<span>&nbsp;Per&nbsp;</span>
+						<span>&nbsp;Vote(s) Per&nbsp;</span>
 						<select name="votes_user">
 							<option value="ip"   <?php if ( $defaults['default_restriction']['votes_user'] == 'ip' )   echo 'selected="selected"'; ?>>IP</option>
 							<option value="user" <?php if ( $defaults['default_restriction']['votes_user'] == 'user' ) echo 'selected="selected"'; ?>>Logged In User</option>
@@ -79,7 +79,7 @@ $defaults = get_option('rt_polls_settings');
 		</table>
 		<p class="submit">
 			<input type="hidden" name="poll-action" value="add_poll"/>
-			<input type="hidden" name="poll-redirect" value="<?php echo esc_url( admin_url( 'admin.php?page=realtime-polls.php' ) ); ?>"/>
+			<input type="hidden" name="poll-redirect" value="<?php echo esc_url( admin_url( 'admin.php?page=rt-polls.php' ) ); ?>"/>
 			<input type="hidden" name="realtime-polls-nonce" value="<?php echo wp_create_nonce( 'realtime_polls_nonce' ); ?>"/>
 			<input type="submit" value="<?php _e( 'Add New Poll', 'rt_polls' ); ?>" class="button-primary"/>
 		</p>

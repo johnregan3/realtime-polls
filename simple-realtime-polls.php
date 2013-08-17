@@ -1,8 +1,8 @@
 <?php
 
 /**
- * Plugin Name: Realtime Polls
- * Plugin URI: http://johnregan3.github.io/realtime-polls
+ * Plugin Name: Simple Realtime Polls
+ * Plugin URI: http://johnregan3.github.io/simple-realtime-polls
  * Description: Create Polls that update in realtime!
  * Author: John Regan
  * Author URI: http://johnregan3.me
@@ -22,22 +22,29 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @package Realtime Polls
+ * @package Simple Realtime Polls
  * @author John Regan
  * @version 1.0
  */
 
-//Polls Admin Page
-include_once( plugin_dir_path(__FILE__) . 'includes/admin/realtime-general.php' );
 
 //Polls Listing Page
-include_once( plugin_dir_path(__FILE__) . 'includes/admin/realtime-polls.php' );
+include_once( plugin_dir_path(__FILE__) . 'includes/admin/rt-polls.php' );
 
-//Shortcode Generator
-include_once( plugin_dir_path(__FILE__) . 'includes/shortcodes.php' );
+//Polls Admin Page
+include_once( plugin_dir_path(__FILE__) . 'includes/admin/polls-settings.php' );
 
-//Process Votes via AJAX
-include_once( plugin_dir_path(__FILE__) . 'includes/ajax-process.php' );
+//Polls Listing Page
+include_once( plugin_dir_path(__FILE__) . 'includes/admin/rt-polls.php' );
+
+//Shortcode
+include_once( plugin_dir_path(__FILE__) . 'includes/poll.php' );
+
+//Processor Classes
+include_once( plugin_dir_path(__FILE__) . 'includes/process.php' );
+
+//Processor Classes
+include_once( plugin_dir_path(__FILE__) . 'includes/widget.php' );
 
 /**
  * Enqueue Admin Styles and Scripts
@@ -77,7 +84,7 @@ function rt_polls_scripts( ) {
 	wp_register_script( 'rt-polls-flot', plugins_url( 'js/flot/jQuery.flot.custom.js', __FILE__), 'jQuery' );
 	wp_enqueue_script( 'rt-polls-flot' );
 
-	wp_register_script( 'vote-process', plugins_url( 'js/vote-process.js', __FILE__) );
+	wp_register_script( 'vote-process', plugins_url( 'js/scripts.js', __FILE__) );
 	wp_localize_script( 'vote-process', 'rt_polls_ajax', array( 'ajaxurl' => admin_url( 'admin-ajax.php' )));
 	wp_enqueue_script( 'vote-process' );
 

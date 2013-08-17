@@ -48,7 +48,13 @@ class RT_Polls_Shortcode {
 	$user    = ( 'user' == $options['votes_user'] ) ? $user_id : $ip ;
 	$rt_options = get_option('rt_polls_settings');
 
-	$labels_array = RT_POLLS::labels_array( $poll_id ); ?>
+	$labels_array = RT_POLLS::labels_array( $poll_id );
+
+	/**
+	 *	@todo Find a better way to load js with variables into the page (& only load on page with poll)
+	 */
+
+	?>
 
 	<script type="text/javascript">
 	<?php
@@ -64,7 +70,7 @@ class RT_Polls_Shortcode {
 
 	<!-- Render the graph -->
 	<div id="placeholder" style="width: 100%; height: 400px;"></div>
-	<div id="newlegend"></div>
+	<div id="rt-legend"></div>
 
 	<!-- Render the Message Area -->
 	<div id="rt-poll-vote-area">

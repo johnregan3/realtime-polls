@@ -23,7 +23,7 @@ $meta = get_post_meta( $poll_id, 'rt_polls_data', true );
 	<div class="icon32" id="rt-polls-icon">
 		<br />
 	</div>
-	<h2><?php _e( 'Edit Poll', 'rt_polls' ); ?> - <a href="<?php echo admin_url( 'admin.php?page=realtime-polls.php&post_type=rt_poll' ); ?>" class="button-secondary"><?php _e( 'Go Back', 'rt_polls' ); ?></a></h2>
+	<h2><?php _e( 'Edit Poll', 'rt_polls' ); ?> - <a href="<?php echo admin_url( 'admin.php?page=rt-polls.php&post_type=rt_poll' ); ?>" class="button-secondary"><?php _e( 'Go Back', 'rt_polls' ); ?></a></h2>
 	<form id="rt-polls-edit-tiem" action="" method="post">
 		<table class="form-table">
 			<tbody>
@@ -33,7 +33,6 @@ $meta = get_post_meta( $poll_id, 'rt_polls_data', true );
 					</th>
 					<td>
 						<input name="name" id="name" type="text" value="<?php echo esc_attr( $poll->post_title ); ?>" style="width: 300px;"/>
-						<p class="description"><?php _e( 'Poll Table.', 'rt_polls' ); ?></p>
 					</td>
 				</tr>
 				<tr class="form-field">
@@ -42,17 +41,19 @@ $meta = get_post_meta( $poll_id, 'rt_polls_data', true );
 					</th>
 					<td>
 						<?php
-						$numbers = array( 1, 2, 3, 4, 5, 6 );
+						$number = 1;
 						foreach ( $numbers as $number ) :
 							$value = isset( $meta['label-title-' . $number] ) ? $meta['label-title-' . $number] : ''; ?>
 							<input type="text" id="<?php echo esc_html( 'label-title-' . $number ) ?>" name="<?php echo esc_html( 'label-title-' . $number ) ?>" value="<?php echo esc_html( $value ) ?>" class="rt-poll-label" placeholder="Label title" /><input type="text" name="<?php echo esc_html( 'field-color-' . $number ) ?>" value="<?php echo esc_html( $meta['field-color-' . $number] ) ?>" class="color-field" />
 							<br />
-						<?php endforeach; ?>
+						<?php
+						$number++;
+						endforeach; ?>
 					</td>
 				</tr>
 				<tr class="form-field">
 					<th scope="row" valign="top">
-						<label for="limit-votes"><?php _e( 'Limit Votes', 'rt_polls' ); ?></label>
+						<label for="limit-votes"><?php _e( 'Vote Limit', 'rt_polls' ); ?></label>
 					</th>
 					<td>
 						<select name="votes_number">
@@ -62,7 +63,7 @@ $meta = get_post_meta( $poll_id, 'rt_polls_data', true );
 							<option value="25" <?php if ( $meta['votes_number'] == 25 ) echo 'selected="selected"'; ?>>25</option>
 							<option value="unlimited" <?php if ( $meta['votes_number'] == 'unlimited' ) echo 'selected="selected"'; ?>>Unlimited</option>
 						</select>
-						<span>&nbsp;Per&nbsp;</span>
+						<span>&nbsp;Vote(s) Per&nbsp;</span>
 						<select name="votes_user">
 							<option value="ip"   <?php if ( $meta['votes_user'] == 'ip' )   echo 'selected="selected"'; ?>>IP</option>
 							<option value="user" <?php if ( $meta['votes_user'] == 'user' ) echo 'selected="selected"'; ?>>Logged In User</option>
@@ -82,7 +83,7 @@ $meta = get_post_meta( $poll_id, 'rt_polls_data', true );
 		<p class="submit">
 			<input type="hidden" name="poll-action" value="edit_poll"/>
 			<input type="hidden" name="poll_id" value="<?php echo absint( $_GET['poll_id'] ); ?>"/>
-			<input type="hidden" name="poll-redirect" value="<?php echo esc_url( admin_url( 'admin.php?page=realtime-polls.php&post_type=rt_poll' ) ); ?>"/>
+			<input type="hidden" name="poll-redirect" value="<?php echo esc_url( admin_url( 'admin.php?page=rt-polls.php&post_type=rt_poll' ) ); ?>"/>
 			<input type="hidden" name="realtime-polls-nonce" value="<?php echo wp_create_nonce( 'realtime_polls_nonce' ); ?>"/>
 			<input type="submit" value="<?php _e( 'Update Poll', 'rt_polls' ); ?>" class="button-primary"/>
 		</p>

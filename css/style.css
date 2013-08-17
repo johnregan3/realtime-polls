@@ -1,13 +1,13 @@
-#newlegend tr {
+#rt-legend tr {
 	float: left;
 	width: 33%;
 }
 
-#newlegend td {
+#rt-legend td {
 	border: 0;
 	padding: 10px 0;
 }
-#newlegend .legendlabel {
+#rt-legend .legendlabel {
 	padding-right: 30px;
 	}
 

@@ -39,14 +39,8 @@ $(document).ready(function() {
 
 
 
-/**
- * Animated Graph Updater
- * August 2013
- *
- * Author:  John Regan
- *          johnregan3.me
- *          @johnregan3
- */
+//Update graph in realtime using WP's Heartbeat API
+
 $(document).on('heartbeat-send', function(e, data) {
 	data['rt_polls_heartbeat'] = 'graph_update';
 	data['poll_id'] = $("#rt-poll-button").attr('data-poll');
