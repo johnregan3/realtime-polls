@@ -124,25 +124,13 @@ function primary_section_cb() {}
 /**
  * @since  1.0
  */
-function fancy_styles() {
-	$options = get_option('rt_polls_settings');
-	$settings_value = isset( $options['fancy_styles'] ) ? $options['fancy_styles'] : 0;
-	?>
-		<input type="checkbox" id="fancy-styles" name="rt_polls_settings[fancy_styles]" value="1" <?php checked( 1, $settings_value ) ?> />&nbsp;&nbsp;<span class="description">On/Off</span>
-	<?php
-}
-
-
-/**
- * @since  1.0
- */
 function graph_orientation() {
 	$options = get_option('rt_polls_settings');
 	$settings_value = isset( $options['graph_orientation'] ) ? $options['graph_orientation'] : 'vertical';
 	?>
 		<select name="rt_polls_settings[graph_orientation]" >
-			<option value="vertical"  <?php if ( $settings_value == 'vertical' )  echo 'selected="selected"'; ?>>Vertical</option>
-			<option value="horizontal"  <?php if ( $settings_value == 'horizontal' )  echo 'selected="selected"'; ?>>Horizontal</option>
+			<option value="vertical"  <?php selected( $settings_value, 'vertical' ); ?>>Vertical</option>
+			<option value="horizontal"  <?php selected( $settings_value, 'horizontal' ); ?>>Horizontal</option>
 		</select>
 	<?php
 }

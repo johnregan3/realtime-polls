@@ -70,6 +70,9 @@ function rt_polls_admin_scripts( ) {
 add_action( 'wp_enqueue_scripts', 'rt_polls_scripts' );
 function rt_polls_scripts( ) {
 
+	/**
+	 *  @todo Need to test this in IE <9
+	 */
 	global $is_IE;
 	if ( $is_IE ) {
 	    wp_enqueue_script( 'excanvas', plugins_url( 'js/flot/excanvas.js', __FILE__), 'jQuery' );

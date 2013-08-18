@@ -1,3 +1,17 @@
+/**
+ *	Simple Realtime Polls Styles
+ */
+
+
+/**
+ *	Poll Styles
+ */
+
+#placeholder {
+	height: 400px;
+	width: 100%;
+}
+
 #rt-legend tr {
 	float: left;
 	width: 33%;
@@ -7,6 +21,7 @@
 	border: 0;
 	padding: 10px 0;
 }
+
 #rt-legend .legendlabel {
 	padding-right: 30px;
 	}
@@ -19,4 +34,33 @@
 
 #message-area {
 	height: 40px;
+}
+
+
+/**
+ *	Widget Styles
+ */
+
+#widget-graph {
+	height: 150px;
+	width: 100%;
+}
+
+#rt-polls-widget-legend {
+	margin-bottom: 5px;
+}
+
+#rt-polls-widget-legend input[type=radio] {
+	display:none;
+}
+
+#rt-polls-widget-legend .checksquare {
+	display: inline-block;
+	height: 15px;
+	margin-right: 7px;
+	width: 16px;
+}
+
+#rt-polls-widget-legend span:hover {
+	cursor: pointer;
 }

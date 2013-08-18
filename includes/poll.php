@@ -48,34 +48,40 @@ class RT_Polls_Shortcode {
 	$user    = ( 'user' == $options['votes_user'] ) ? $user_id : $ip ;
 	$rt_options = get_option('rt_polls_settings');
 
-	$labels_array = RT_POLLS::labels_array( $poll_id );
+	$labels_array = RT_Polls::labels_array( $poll_id );
 
 	/**
-	 *	@todo Find a better way to load js with variables into the page (& only load on page with poll)
+	 *	@todo Find a better way to load js with variables into the page (and only load on page with poll)
 	 */
 
 	?>
 
 	<script type="text/javascript">
 	<?php
-		$js_data = RT_POLLS::combine_data( $poll_id );
+		$js_data = RT_Polls::combine_data( $poll_id, 'not-widget' );
 		echo $js_data;
 
-		$script_options = "{" . RT_POLLS::prep_options( $poll_id ) . "}";
+		$script_options = "{" . RT_Polls::prep_options( $poll_id, 'not-widget' ) . "}";
 		 ?>
 		 jQuery(document).ready( function(){
-			jQuery.plot( jQuery( "#placeholder" ),  data_1, <?php echo $script_options ?> );
+			jQuery.plot( jQuery( "#placeholder" ),  data_poll, <?php echo $script_options ?> );
 		});
 	</script>
 
 	<!-- Render the graph -->
-	<div id="placeholder" style="width: 100%; height: 400px;"></div>
+	<div id="placeholder"></div>
 	<div id="rt-legend"></div>
 
 	<!-- Render the Message Area -->
+
 	<div id="rt-poll-vote-area">
 		<select id="rt-vote-select">
-			<?php $numbers = array( 1, 2, 3, 4, 5, 6 );
+			<?php
+
+			/**
+			 * @todo Need to rework this.
+			 */
+			$numbers = array( 1, 2, 3, 4, 5, 6 );
 			foreach ( $numbers as $num ) :
 				${'label_' . $num } = isset( $options['label-title-' . $num] ) ? $options['label-title-' . $num] : '';
 				if ( ${'label_' . $num } ) {

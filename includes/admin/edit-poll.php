@@ -41,7 +41,7 @@ $meta = get_post_meta( $poll_id, 'rt_polls_data', true );
 					</th>
 					<td>
 						<?php
-						$number = 1;
+						$numbers = array(1, 2, 3, 4, 5, 6 );
 						foreach ( $numbers as $number ) :
 							$value = isset( $meta['label-title-' . $number] ) ? $meta['label-title-' . $number] : ''; ?>
 							<input type="text" id="<?php echo esc_html( 'label-title-' . $number ) ?>" name="<?php echo esc_html( 'label-title-' . $number ) ?>" value="<?php echo esc_html( $value ) ?>" class="rt-poll-label" placeholder="Label title" /><input type="text" name="<?php echo esc_html( 'field-color-' . $number ) ?>" value="<?php echo esc_html( $meta['field-color-' . $number] ) ?>" class="color-field" />

@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  * @since 1.0
  */
 
-class RT_POLLS {
+class RT_Polls {
 
 
 	/**
@@ -113,6 +113,8 @@ class RT_POLLS {
 		}
 		if ( isset( $votes_submitted ) && $votes_submitted >= $limit ) {
 
+			$info['data_1'] = '';
+			$info['options'] = '';
 			$info['message'] = RT_Polls::setting( 'failure_message' );
 			$json_result = json_encode( $info );
 			echo $json_result;
@@ -168,7 +170,6 @@ class RT_POLLS {
 				$a++;
 				$i++;
 			endforeach;
-
 		ob_start();
 		foreach($sets as $set):
 			echo $set;
@@ -187,7 +188,7 @@ class RT_POLLS {
 	 */
 	static function prep_data( $poll_id ) {
 		$options = get_post_meta( $poll_id, 'rt_polls_data', true );
-		$labels_array = RT_POLLS::labels_array( $poll_id );
+		$labels_array = RT_Polls::labels_array( $poll_id );
 		end($labels_array);
 		$last_key = key($labels_array);
 			$i = 1;
@@ -220,8 +221,10 @@ class RT_POLLS {
 	 * @param  string  $poll_id  The ID of the poll being used
 	 * @return string  $content  The content of the needed Javascript
 	 */
-	static function prep_options( $poll_id ) {
-	$labels_array = RT_POLLS::labels_array( $poll_id );
+	static function prep_options( $poll_id, $widget ) {
+		$horizontal = ('horizontal' == RT_Polls::setting( 'graph_orientation' ) );
+		$widget = ( 'widget' == $widget );
+		$labels_array = RT_POLLS::labels_array( $poll_id );
 		end($labels_array);
 		$last_key = key($labels_array);
 		$i = 0;
@@ -230,20 +233,37 @@ class RT_POLLS {
 			$ticks[] = "[" . $i . ", '']" . $ending;
 			$i++;
 		endforeach;
-		$content=	"legend: { show: true, container: jQuery('#rt-legend') },";
-		if( 'horizontal' == RT_Polls::setting( 'graph_orientation' ) ) :
-			$axis = "bars: { horizontal: true }, yaxis: { tickLength: '0', ticks: [ ";
+		if ( $widget ) :
+			$content = "legend: { show: false, }, ";
 		else :
-			$axis = "xaxis: { tickLength: '0', ticks: [ ";
+			$content = "legend: { show: true, container: jQuery('#rt-legend') }, ";
 		endif;
-		$content2 = "] }, grid: { borderWidth: 0 }";
+
+		if ( $widget && ! $horizontal ) :
+			$axis = '';
+		elseif ( $widget && $horizontal ) :
+			$axis = "bars: { horizontal: true }, ";
+		elseif ( ! $widget && $horizontal ) :
+			$axis = "bars: { horizontal: true }, yaxis: ";
+		else :
+			$axis = "xaxis: ";
+		endif;
+
+		$content2 = "grid: { borderWidth: 0 }";
 
 		ob_start();
-			echo $content;
+				echo $content;
 			echo $axis;
-			foreach ( $ticks as $tick ) :
-				echo $tick;
-			endforeach;
+			if ( $widget ) :
+				echo $axis;
+				echo "xaxis: { ticks: 0 }, ";
+			else :
+				echo "{ tickLength: '0', ticks: [ ";
+				foreach ( $ticks as $tick ) :
+					echo $tick;
+				endforeach;
+				echo "] }, ";
+			endif;
 			echo $content2;
 			$content = ob_get_contents();
 		ob_end_clean();
@@ -259,11 +279,12 @@ class RT_POLLS {
 	 * @param  array   $poll_id  The ID of the poll being used
 	 * @return string  New JavaScript string
 	 */
-	static function combine_data( $poll_id ){
+	static function combine_data( $poll_id, $widget ){
 		$js_coordinates = RT_POLLS::prep_coordinates( $poll_id );
 		$js_data = RT_POLLS::prep_data( $poll_id );
+		$var_name = ( 'widget' == $widget ) ? 'data_widget' : 'data_poll';
 		$return = $js_coordinates . '
-		  var data_1 = ' . $js_data;
+		  var ' . $var_name . ' = ' . $js_data;
 		return $return;
 	}
 
@@ -285,7 +306,7 @@ class RT_POLLS {
 	 * @param  string  $time       Current time
 	 * @return void
 	 */
-	static function save_vote( $poll_id, $poll_meta, $selection, $user, $time ) {
+	static function save_vote( $poll_id, $poll_meta, $selection, $user, $time, $widget ) {
 		//Cycle through fields, find a match and add one to the score.
 		foreach( $poll_meta as $field => $val ) {
 			if ( $selection == $field ) {
@@ -302,12 +323,13 @@ class RT_POLLS {
 
 		$result = update_post_meta( $poll_id, 'rt_polls_data', $poll_meta );
 
+		$info['widget'] = ( 'widget' == $widget ) ? true : false;
 		$message = $result ? RT_Polls::setting( 'success_message' ) : "Vote Failed.";
 			$info['message'] = esc_html( $message );
-		$js_data = RT_POLLS::combine_data( $poll_id );
-			$info['data_1'] = esc_html( $js_data );
-		$js_options = RT_POLLS::prep_options( $poll_id );
-			$info['options'] = "var options = {" . esc_html( $js_options ) . "}";
+		$js_data = RT_POLLS::combine_data( $poll_id, $widget );
+			$info['data'] = $js_data; //Don't esc this.  Breaks the JS.
+		$js_options = RT_POLLS::prep_options( $poll_id, $widget );
+			$info['options'] = "var options = {" . $js_options . "}"; //Don't esc this.  Breaks the JS.
 
 		$json_result = json_encode( $info );
 		echo $json_result;
@@ -340,9 +362,10 @@ function rt_poll_process() {
 		exit( "Failed nonce verification." );
 
 	//get variables
-	$poll_id = $_REQUEST['poll_id'];
-	$user = $_REQUEST['user'];
-	$time = current_time( 'timestamp', 1 );
+	$poll_id   = $_REQUEST['poll_id'];
+	$user      = $_REQUEST['user'];
+	$widget    = $_REQUEST['widget'];
+	$time      = current_time( 'timestamp', 1 );
 	$selection = $_REQUEST['selection'];
 	$poll_meta = get_post_meta( $poll_id, 'rt_polls_data', true );
 
@@ -355,7 +378,7 @@ function rt_poll_process() {
 
 	if( $limit_check == true ) {
 	//Save the Vote, and, on success, return a message
-		RT_POLLS::save_vote( $poll_id, $poll_meta, $selection, $user, $time );
+		RT_POLLS::save_vote( $poll_id, $poll_meta, $selection, $user, $time, $widget );
 	}
 
 }
@@ -383,12 +406,26 @@ function rt_polls_heartbeat_received( $response, $data ) {
 	// Make sure we only run our query if the heartbeat key is present
 	if( $data['rt_polls_heartbeat'] == 'graph_update' ) {
 
-		$js_data = RT_POLLS::combine_data( $data['poll_id'] );
-			$info['data_1'] = $js_data;
-		$js_options = RT_POLLS::prep_options( $data['poll_id'] );
-			$info['options'] = "var options = {" . $js_options . "}";
+		if ( $data['poll_id'] ) {
 
-		$response['poll_data'] = $info;
+			$js_data = RT_POLLS::combine_data( $data['poll_id'] );
+				$info['data_1'] = $js_data;
+			$js_options = RT_POLLS::prep_options( $data['poll_id'] );
+				$info['options'] = "var options = {" . $js_options . "}";
+
+			$response['poll_data'] = $info;
+
+		} elseif ( $data['widget_poll_id'] ){
+
+			$js_data = RT_POLLS::combine_data( $data['widget_poll_id'] );
+				$info['data_1'] = $js_data;
+			$js_options = RT_POLLS::prep_options( $data['widget_poll_id'] );
+				$info['options'] = "var options = {" . $js_options . "}";
+
+			$response['widget_poll_data'] = $info;
+
+		}
+
 	}
 	return $response;
 }
