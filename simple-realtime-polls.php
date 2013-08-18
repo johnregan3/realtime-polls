@@ -79,7 +79,6 @@ function rt_polls_scripts( ) {
 	}
 
 	wp_enqueue_script( 'jquery' );
-	wp_enqueue_script( 'heartbeat' );
 
 	wp_register_style( 'rt-polls-style', plugins_url( 'css/style.css', __FILE__) );
 	wp_enqueue_style( 'rt-polls-style' );
@@ -90,6 +89,8 @@ function rt_polls_scripts( ) {
 	wp_register_script( 'vote-process', plugins_url( 'js/scripts.js', __FILE__) );
 	wp_localize_script( 'vote-process', 'rt_polls_ajax', array( 'ajaxurl' => admin_url( 'admin-ajax.php' )));
 	wp_enqueue_script( 'vote-process' );
+
+	wp_enqueue_script( 'heartbeat' );
 
 }
 

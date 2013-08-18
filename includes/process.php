@@ -395,38 +395,45 @@ function rt_poll_must_login() {
 /**
  * Use Heartbeat API to update graph bars
  *
- * @since 1.0
- * @param array   $response
- * @param array   $data      Information sent from heartbeat-send
+ * @since  1.0
+ * @param  array  $response
+ * @param  array  $data      Information sent from heartbeat-send
  * @return array  $response  Infomation sent back to heartbeat-tick
  */
 
 function rt_polls_heartbeat_received( $response, $data ) {
 
+/*
 	// Make sure we only run our query if the heartbeat key is present
-	if( $data['rt_polls_heartbeat'] == 'graph_update' ) {
+	if ( $data['rt_polls_heartbeat'] == 'graph_update' ) {
 
-		if ( $data['poll_id'] ) {
+		if ( ! empty( $data['poll_id'] ) ) {
 
 			$js_data = RT_POLLS::combine_data( $data['poll_id'] );
-				$info['data_1'] = $js_data;
+				$poll['data_poll'] = $js_data;
 			$js_options = RT_POLLS::prep_options( $data['poll_id'] );
-				$info['options'] = "var options = {" . $js_options . "}";
+				$poll['options_poll'] = "var optionsWidget = {" . $js_options . "}";
 
-			$response['poll_data'] = $info;
-
-		} elseif ( $data['widget_poll_id'] ){
-
-			$js_data = RT_POLLS::combine_data( $data['widget_poll_id'] );
-				$info['data_1'] = $js_data;
-			$js_options = RT_POLLS::prep_options( $data['widget_poll_id'] );
-				$info['options'] = "var options = {" . $js_options . "}";
-
-			$response['widget_poll_data'] = $info;
+			$poll_array['poll_data'] = $poll;
 
 		}
 
-	}
-	return $response;
+		if ( ! empty( $data['widget_poll_id'] ) ) {
+
+			$js_data = RT_Polls::combine_data( $data['widget_poll_id'] );
+				$widget['data_widget'] = $js_data;
+			$js_options = RT_Polls::prep_options( $data['widget_poll_id'] );
+				$widget['options_widget'] = "var optionsPoll = {" . $js_options . "}";
+
+			$widget_array['widget_poll_data'] = $widget;
+
+		}
+
+	} */
+		$response['polls_data'] = $data['widget_poll_id'];
+
+		return $response;
+
+
 }
 add_filter( 'heartbeat_received', 'rt_polls_heartbeat_received', 10, 2 );
